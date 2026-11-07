@@ -264,34 +264,45 @@ class PhysicsStar {
 
 // Canvas-Based Realistic Rocket Projectile
 class Rocket {
-    constructor(startX, startY, targetX, targetY) {
+    constructor(startX, startY, targetX, targetY, isGrand = false, volume = 0.3) {
         this.x = startX;
         this.y = startY;
         this.lastX = startX;
         this.lastY = startY;
+        this.targetX = targetX;
         this.targetY = targetY;
-        this.speed = 17.5;
-        this.acceleration = 1.015;
+        this.isGrand = isGrand;
+        this.volume = volume;
+
+        const dx = targetX - startX;
+        const dy = targetY - startY;
+        const dist = Math.hypot(dx, dy) || 1;
+        // Fast, tactile climbing speed (reaches sky in ~0.35s - 0.45s)
+        const flightSpeed = isGrand ? 17.5 : 22.0;
+
+        this.vx = (dx / dist) * flightSpeed;
+        this.vy = (dy / dist) * flightSpeed;
         this.isDead = false;
     }
 
     update() {
         this.lastX = this.x;
         this.lastY = this.y;
-        this.y -= this.speed;
-        this.speed *= this.acceleration;
+        this.x += this.vx;
+        this.y += this.vy;
 
-        // Trailing sparks along rocket flight path
-        for (let i = 0; i < 3; i++) {
+        // Trailing sparks along rocket flight path from city
+        for (let i = 0; i < 2; i++) {
             embers.push(new TrailingSpark(
-                this.x + (Math.random() - 0.5) * 4,
-                this.y + Math.random() * 10,
-                (Math.random() - 0.5) * 1.5,
-                Math.random() * 2 + 1,
-                Math.random() > 0.4 ? '#ffd700' : '#ff4500'
+                this.x + (Math.random() - 0.5) * 3,
+                this.y + (Math.random() - 0.5) * 3,
+                this.vx * 0.12,
+                this.vy * 0.12 + 0.4,
+                Math.random() > 0.4 ? '#ffd700' : '#ff5500'
             ));
         }
 
+        // Reached apex target in sky
         if (this.y <= this.targetY) {
             this.isDead = true;
         }
@@ -304,7 +315,6 @@ class Rocket {
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2.4;
         ctx.lineCap = 'round';
-        ctx.globalAlpha = 1;
         ctx.stroke();
     }
 }
@@ -408,7 +418,14 @@ function loop() {
         r.draw();
         if (r.isDead) {
             rockets.splice(i, 1);
-            executeDetonation(r.x, r.targetY);
+            if (r.isGrand) {
+                executeDetonation(r.x, r.targetY);
+            } else {
+                // Rocket from city reaches sky target -> explodes!
+                playExplosionSound(r.volume);
+                const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
+                createSphericalShell(r.x, r.targetY, palette, false);
+            }
         }
     }
 
@@ -443,9 +460,9 @@ function startLaunch() {
     // 1. Play authentic fast whistle sound as rocket ascends
     playWhistleSound();
 
-    // 2. Spawn canvas rocket shooting from bottom center
+    // 2. Spawn grand canvas rocket shooting from city skyline
     const targetY = height * 0.44;
-    rockets.push(new Rocket(width / 2, height + 10, width / 2, targetY));
+    rockets.push(new Rocket(width / 2, height * 0.85, width / 2, targetY, true, 0.85));
 }
 
 function executeDetonation(x, y) {
@@ -487,7 +504,7 @@ function executeDetonation(x, y) {
     }, 250);
 }
 
-// Background Automatic Fireworks: Paced comfortably, slows down after 4 cracks
+// Background Automatic Fireworks: Visibly launched from the illuminated city rooftops
 function scheduleNextAutoFirework() {
     if (!isCelebration) return;
 
@@ -498,11 +515,14 @@ function scheduleNextAutoFirework() {
         if (!isCelebration) return;
         autoCrackCount++;
 
-        const rx = Math.random() * (width * 0.76) + (width * 0.12);
-        const ry = Math.random() * (height * 0.40) + 50;
+        const targetX = Math.random() * (width * 0.76) + (width * 0.12);
+        const targetY = Math.random() * (height * 0.38) + 50;
 
-        // Subtle volume (0.16) so it never overpowers Modi Ji's speech
-        triggerCrispFirework(rx, ry, 0.16);
+        // Launches visibly from the illuminated city rooftop horizon
+        const startX = targetX + (Math.random() - 0.5) * 80;
+        const startY = height * 0.85;
+
+        rockets.push(new Rocket(startX, startY, targetX, targetY, false, 0.16));
 
         scheduleNextAutoFirework();
     }, delay);
@@ -518,7 +538,7 @@ playBtn.addEventListener('click', (e) => {
     startLaunch();
 });
 
-// Tap anywhere on screen to blast crisp fireworks
+// Tap anywhere on screen: Rocket shoots up from city to your tapped sky point!
 function handleTap(clientX, clientY) {
     if (!isCelebration) return;
 
@@ -528,8 +548,15 @@ function handleTap(clientX, clientY) {
         tapGuide.style.pointerEvents = 'none';
     }
 
-    // Tactile user blast (moderate volume 0.32 - crisp but doesn't overpower speech)
-    triggerCrispFirework(clientX, clientY, 0.32);
+    // Target in sky (clamped so it doesn't detonate down in the city)
+    const targetX = clientX;
+    const targetY = Math.min(clientY, height * 0.65);
+
+    // Launches straight up from the city rooftops directly beneath the tapped column
+    const startX = targetX + (Math.random() - 0.5) * 40;
+    const startY = height * 0.85;
+
+    rockets.push(new Rocket(startX, startY, targetX, targetY, false, 0.32));
 }
 
 window.addEventListener('click', (e) => {
