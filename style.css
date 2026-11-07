@@ -232,13 +232,14 @@ body.screen-quake {
 }
 
 .greeting-container {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     width: 100%;
-    max-width: 600px;
+    max-width: 650px;
     animation: containerFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -247,33 +248,119 @@ body.screen-quake {
     100% { transform: scale(1) translateY(0); opacity: 1; filter: blur(0); }
 }
 
+/* Radiant Golden Backlight Halo */
+.heading-glow-halo {
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: clamp(280px, 85vw, 560px);
+    height: clamp(150px, 42vw, 290px);
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(255, 195, 50, 0.42) 0%, rgba(255, 95, 10, 0.18) 46%, transparent 75%);
+    filter: blur(35px);
+    pointer-events: none;
+    z-index: 0;
+    animation: haloBreathe 3.2s ease-in-out infinite alternate;
+    will-change: transform, opacity;
+}
+
+@keyframes haloBreathe {
+    0% { transform: translate(-50%, -50%) scale(0.92); opacity: 0.75; }
+    100% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+}
+
+/* Luxury Diwali Title Box */
+.diwali-title-box {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+}
+
+/* Festival of Lights Badge */
+.diwali-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    opacity: 0.95;
+}
+
+.badge-gem {
+    color: #ffd700;
+    font-size: 11px;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
+}
+
+.badge-line {
+    width: clamp(20px, 5vw, 38px);
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.75), transparent);
+}
+
+.badge-label {
+    font-family: 'Cinzel', serif;
+    font-size: clamp(0.68rem, 2vw, 0.82rem);
+    font-weight: 700;
+    letter-spacing: clamp(3px, 1vw, 5px);
+    color: #ffe6a0;
+    text-transform: uppercase;
+    text-shadow: 0 0 12px rgba(255, 190, 0, 0.7);
+}
+
 /* Polished Golden Typography */
 .diwali-heading {
-    font-family: 'Cinzel', serif;
-    font-size: clamp(2.8rem, 10vw, 5.8rem);
-    font-weight: 900;
-    letter-spacing: clamp(4px, 1.2vw, 10px);
-    line-height: 1.05;
-    text-transform: uppercase;
-    margin-bottom: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
+    line-height: 1;
+    margin: 0;
 }
 
 .diwali-heading .text-happy {
-    display: block;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FFF5CC 40%, #FFD700 100%);
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(3.2rem, 11vw, 5.6rem);
+    font-weight: 400;
+    letter-spacing: 2px;
+    line-height: 1.05;
+    margin-bottom: -12px;
+    margin-left: -6px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFF8D6 25%, #FFD700 65%, #FF9900 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 2px 14px rgba(255, 215, 0, 0.65));
+    filter: drop-shadow(0 0 16px rgba(255, 215, 0, 0.95)) drop-shadow(0 0 32px rgba(255, 120, 0, 0.65));
+    transform: rotate(-3deg);
+    display: inline-block;
 }
 
 .diwali-heading .text-diwali {
-    display: block;
-    background: linear-gradient(180deg, #FFF9E6 0%, #FFA500 50%, #FF3700 100%);
+    font-family: 'Cinzel Decorative', 'Cinzel', serif;
+    font-size: clamp(2.8rem, 10vw, 5.4rem);
+    font-weight: 900;
+    letter-spacing: clamp(5px, 1.8vw, 13px);
+    line-height: 1.05;
+    text-transform: uppercase;
+    background: linear-gradient(
+        180deg,
+        #FFFFFF 0%,
+        #FFF9E5 18%,
+        #FFD700 45%,
+        #FF9E00 70%,
+        #E63E00 100%
+    );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 28px rgba(255, 77, 0, 0.85)) drop-shadow(0 0 55px rgba(255, 160, 0, 0.5));
-    animation: titleGlowBreathe 2.4s infinite alternate ease-in-out;
+    filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.95))
+           drop-shadow(0 0 25px rgba(255, 215, 0, 0.95))
+           drop-shadow(0 0 55px rgba(255, 90, 0, 0.75));
+    animation: titleGlowBreathe 2.8s infinite alternate ease-in-out;
     transform: translateZ(0);
     will-change: opacity;
 }
@@ -281,6 +368,32 @@ body.screen-quake {
 @keyframes titleGlowBreathe {
     0% { opacity: 0.92; }
     100% { opacity: 1; }
+}
+
+/* Ornamental Divider */
+.ornament-divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 10px;
+    margin-bottom: 2px;
+    width: 100%;
+    max-width: 300px;
+}
+
+.divider-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.65), transparent);
+}
+
+.divider-gem {
+    font-size: 11px;
+    color: #ffd700;
+    letter-spacing: 2px;
+    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
+    white-space: nowrap;
 }
 
 /* ===================================================
