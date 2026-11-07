@@ -3,98 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🪔 Happy Diwali from Modi Ji | Mitrooon Dhamaka!</title>
+    <title>💥</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Poppins:wght@400;600;700;800&family=Rozha+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Poppins:wght@600;800&family=Rozha+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background Canvas for Fireworks & Nuclear Blast -->
-    <canvas id="fireworksCanvas"></canvas>
+    <!-- Background Canvas for Nuclear Plasma & Fireworks -->
+    <canvas id="canvas"></canvas>
 
-    <!-- Screen Flash Overlay for Atomic Blast -->
-    <div id="flashOverlay" class="flash-overlay"></div>
+    <!-- White-hot Blinding Flash Overlay for Nuclear Detonation -->
+    <div id="flash" class="flash-overlay"></div>
 
-    <!-- Shockwave Ring Effect -->
+    <!-- Expanding Plasma Shockwave -->
     <div id="shockwave" class="shockwave"></div>
 
-    <!-- Background Stars & Aura -->
-    <div class="stars-container"></div>
-    <div class="ambient-glow"></div>
-
-    <!-- Initial Screen: Play Button -->
-    <div id="startScreen" class="start-screen">
-        <div class="launch-card">
-            <div class="diya-badge">🪔</div>
-            <h2 class="pre-title">SPECIAL DIWALI BROADCAST</h2>
-            <h1 class="main-tagline">Modi Ji Has A Message For You</h1>
-            <p class="sub-text">Warning: Extreme High-Voltage Nuclear Dhamaka Ahead 💥</p>
-            
-            <button id="igniteBtn" class="ignite-button">
-                <span class="btn-glow"></span>
-                <span class="btn-icon">🚀</span>
-                <span class="btn-text">TOUCH TO IGNITE BOMB</span>
-                <span class="btn-particles">✨</span>
-            </button>
-            <div class="audio-hint">🔊 Turn Volume Up For Maximum Swag!</div>
-        </div>
+    <!-- Minimal Meme Landing Screen: ONLY the Play Button -->
+    <div id="landingScreen" class="landing-screen">
+        <button id="playBtn" class="meme-play-btn" aria-label="Play">
+            <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+            </svg>
+            <div class="pulse-ring"></div>
+        </button>
     </div>
 
-    <!-- Rocket Projectile Animation Element -->
+    <!-- Rocket Projectile with Spark Trail -->
     <div id="rocket" class="rocket">
-        <div class="rocket-head">🧨</div>
-        <div class="rocket-sparks"></div>
-        <div class="rocket-trail"></div>
+        <div class="rocket-core">🧨</div>
+        <div class="rocket-fire"></div>
     </div>
 
-    <!-- Celebration Stage (Revealed after the Blast) -->
-    <div id="celebrationStage" class="celebration-stage hidden">
-        <!-- Floating Greeting Header -->
-        <div class="greeting-box">
-            <div class="mitro-tag">✨ MITROOON! ✨</div>
-            <h1 class="stylish-diwali">
-                <span class="glow-word">HAPPY</span>
-                <span class="glow-word flame">DIWALI</span>
+    <!-- Celebration Screen: ONLY "HAPPY DIWALI" Stylish Greeting -->
+    <div id="celebrationScreen" class="celebration-screen hidden">
+        <div class="diwali-box">
+            <h1 class="diwali-text">
+                <span class="happy">HAPPY</span>
+                <span class="diwali">DIWALI</span>
             </h1>
-            <p class="subtitle">May Your Life Shine Brighter Than 1000 Megatons! 🪔✨</p>
-        </div>
-
-        <!-- Modi Ji Hero Visual -->
-        <div class="modi-container">
-            <div class="hero-aura"></div>
-            <div class="modi-frame">
-                <img id="modiImg" src="modi.png" alt="Modi Ji Diwali Swag" class="modi-portrait">
-                <div class="sunglasses-shine"></div>
-            </div>
-            <div class="speech-bubble" id="speechBubble">
-                <span class="bubble-icon">🎙️</span>
-                <span class="bubble-text">"My dear friendzzzz! Happy Diwali!..."</span>
+            <div class="flame-diyas">
+                <span class="diya">🪔</span>
+                <span class="sparkle">✨</span>
+                <span class="diya">🪔</span>
             </div>
         </div>
 
-        <!-- Floating Diyas -->
-        <div class="diyas-row">
-            <div class="floating-diya left">🪔</div>
-            <div class="floating-diya center-left">✨</div>
-            <div class="floating-diya center-right">✨</div>
-            <div class="floating-diya right">🪔</div>
-        </div>
-
-        <!-- Controls & Tap hint -->
-        <div class="footer-controls">
-            <p class="tap-hint">💥 Tap anywhere on screen to blast more fireworks!</p>
-            <div class="audio-bar">
-                <button id="toggleAudioBtn" class="pill-btn">🔊 Playing Voice</button>
-                <button id="replayBtn" class="pill-btn">🔄 Replay Blast</button>
-            </div>
-        </div>
+        <button id="replayBtn" class="replay-btn" title="Replay">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+            </svg>
+        </button>
     </div>
 
-    <!-- Hidden Audio Player -->
+    <!-- Audio Element for Modi Ji Diwali Voice Message -->
     <audio id="diwaliAudio" preload="auto">
         <source src="diwali-wish.mp3" type="audio/mpeg">
-        Your browser does not support the audio tag.
     </audio>
 
     <script src="script.js"></script>
