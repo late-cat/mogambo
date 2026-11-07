@@ -18,12 +18,15 @@
 
     <!-- Minimalist Meme Landing Screen: Sleek Play Button -->
     <div id="landingScreen" class="landing-screen">
-        <button id="playBtn" class="play-btn" aria-label="Play">
-            <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z"/>
-            </svg>
-            <div class="btn-ripple"></div>
-        </button>
+        <div class="play-btn-wrapper">
+            <button id="playBtn" class="play-btn" aria-label="Play">
+                <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z"/>
+                </svg>
+                <div class="btn-ripple"></div>
+            </button>
+            <div id="clickHint" class="click-hint">Click ▶</div>
+        </div>
     </div>
 
     <!-- Celebration Screen: Typography + Dynamic Living Diya -->
@@ -96,8 +99,8 @@
                 </div>
             </div>
 
-            <!-- Crisp Tap Hint -->
-            <p class="tap-guide">Tap anywhere to blast fireworks 💥</p>
+            <!-- Fading Tap Hint -->
+            <div id="tapGuide" class="tap-guide">Tap screen to celebrate ✨</div>
         </div>
 
         <!-- Sleek Floating Replay Button -->

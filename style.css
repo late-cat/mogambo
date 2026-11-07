@@ -26,7 +26,7 @@ html, body {
     min-height: 100dvh;
     overflow: hidden;
     position: fixed;
-    background-color: var(--bg);
+    background: radial-gradient(ellipse at 50% 25%, #180528 0%, #0a0112 55%, #030006 100%);
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     color: #ffffff;
     touch-action: manipulation;
@@ -61,6 +61,34 @@ html, body {
     opacity: 0;
     transform: scale(0.95);
     pointer-events: none;
+}
+
+.play-btn-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.click-hint {
+    position: absolute;
+    bottom: -38px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: rgba(255, 230, 160, 0.8);
+    pointer-events: none;
+    opacity: 0;
+    animation: hintBreatheCycle 4.5s ease-in-out infinite 2.5s;
+    text-shadow: 0 0 10px rgba(255, 170, 0, 0.5);
+}
+
+@keyframes hintBreatheCycle {
+    0%, 15% { opacity: 0; transform: translateY(4px); }
+    30%, 60% { opacity: 0.9; transform: translateY(0); }
+    75%, 100% { opacity: 0; transform: translateY(-3px); }
 }
 
 .play-btn {
@@ -388,13 +416,24 @@ body.screen-quake {
     100% { transform: translateY(-48px) translateX(-3px); opacity: 0; }
 }
 
-/* Tap Hint */
+/* Disappearing Tap Hint (Pulses 2-3 times then vanishes) */
 .tap-guide {
-    font-size: clamp(0.75rem, 2.6vw, 0.92rem);
+    font-size: clamp(0.72rem, 2.5vw, 0.88rem);
     color: rgba(255, 225, 160, 0.75);
-    letter-spacing: 1px;
+    letter-spacing: 1.5px;
     font-weight: 600;
     text-transform: uppercase;
+    opacity: 0;
+    animation: tapGuideFadeCycle 7s ease-in-out forwards 0.8s;
+    transition: opacity 0.4s ease;
+}
+
+@keyframes tapGuideFadeCycle {
+    0% { opacity: 0; transform: translateY(6px); }
+    15%, 35% { opacity: 0.85; transform: translateY(0); }
+    48% { opacity: 0.15; }
+    62%, 80% { opacity: 0.75; transform: translateY(0); }
+    92%, 100% { opacity: 0; transform: translateY(-4px); pointer-events: none; }
 }
 
 /* Replay Button */

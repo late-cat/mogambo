@@ -12,16 +12,19 @@ const celebrationScreen = document.getElementById('celebrationScreen');
 const replayBtn = document.getElementById('replayBtn');
 const diwaliAudio = document.getElementById('diwaliAudio');
 const whistleAudio = document.getElementById('whistleAudio');
+const tapGuide = document.getElementById('tapGuide');
 
 let width, height, dpr;
 let particles = [];
 let rockets = [];
+let stars = [];
 let isCelebration = false;
 let autoFireworksTimer = null;
+let autoCrackCount = 0;
 
 // High-DPI Canvas Resizing
 function resizeCanvas() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for optimal 60fps performance
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = width * dpr;
@@ -29,12 +32,30 @@ function resizeCanvas() {
     canvas.style.width = width + 'px';
     canvas.style.height = height + 'px';
     ctx.scale(dpr, dpr);
+    initStars();
 }
+
+// Subtle Twinkling Night Stars in the Sky
+function initStars() {
+    stars = [];
+    const starCount = Math.floor(Math.min(width, height) / 10);
+    for (let i = 0; i < starCount; i++) {
+        stars.push({
+            x: Math.random() * width,
+            y: Math.random() * (height * 0.7),
+            r: Math.random() * 1.1 + 0.3,
+            baseAlpha: Math.random() * 0.5 + 0.15,
+            phase: Math.random() * Math.PI * 2,
+            speed: Math.random() * 0.02 + 0.008
+        });
+    }
+}
+
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 // ===================================================
-// AUDIO ENGINE: AUTHENTIC FIREWORK SOUNDS
+// AUDIO ENGINE: BALANCED DIWALI SOUNDS
 // ===================================================
 
 // Pre-warmed audio pool for polyphonic zero-latency explosion playback
@@ -48,8 +69,8 @@ for (let i = 0; i < POOL_SIZE; i++) {
 }
 let poolIndex = 0;
 
-// Play Explosion Sound (WAV)
-function playExplosionSound(volume = 1.0) {
+// Play Explosion Sound (WAV) - Kept balanced to never overpower Modi Ji's voice
+function playExplosionSound(volume = 0.3) {
     try {
         const audio = explosionPool[poolIndex];
         poolIndex = (poolIndex + 1) % POOL_SIZE;
@@ -64,7 +85,7 @@ function playWhistleSound() {
     try {
         if (whistleAudio) {
             whistleAudio.currentTime = 0;
-            whistleAudio.volume = 1.0;
+            whistleAudio.volume = 0.85;
             whistleAudio.play().catch(e => console.warn('Whistle playback note:', e));
         }
     } catch (e) {}
@@ -81,14 +102,15 @@ function stopWhistleSound() {
 }
 
 // ===================================================
-// PARTICLE ENGINE: CRISP, LUMINOUS FIREWORK STREAKS
+// PARTICLE ENGINE: AESTHETIC TRADITIONAL WARM COLORS
+// (No artificial AI cyan/neon blue - strictly authentic Diwali)
 // ===================================================
 
 const COLOR_PALETTES = [
-    ['#ffffff', '#fff275', '#ffd700', '#ff9f1c', '#ff3838'], // Golden Flame
-    ['#00f5d4', '#7b2cbf', '#ff007f', '#ffffff', '#fee440'], // Electric Festive
-    ['#ff0055', '#ff5400', '#ffd000', '#39ff14', '#00e5ff'], // Sparkling Carnival
-    ['#ff99c8', '#fcf6bd', '#d0f4de', '#a9def9', '#ffffff']  // Diamond Glow
+    ['#ffffff', '#fff9d6', '#ffd700', '#fdbb2d', '#f46b45'], // Royal Gold & Saffron Flame
+    ['#ffffff', '#ffe066', '#ff5722', '#e50914', '#ffd700'], // Radiant Crimson & Sunset Amber
+    ['#ffffff', '#fff5cc', '#ffd700', '#00c853', '#69f0ae'], // Festive Emerald & Gold Brocade
+    ['#ffffff', '#ffab00', '#ff3d00', '#d50000', '#ffc107']  // Shimmering Ruby & Gold
 ];
 
 class Particle {
@@ -100,12 +122,12 @@ class Particle {
         this.color = color;
         this.vx = vx;
         this.vy = vy;
-        this.friction = isBrocade ? 0.965 : 0.955;
-        this.gravity = isBrocade ? 0.065 : 0.085;
-        this.decay = Math.random() * (isBrocade ? 0.012 : 0.02) + 0.009;
+        this.friction = isBrocade ? 0.966 : 0.956;
+        this.gravity = isBrocade ? 0.062 : 0.082;
+        this.decay = Math.random() * (isBrocade ? 0.011 : 0.019) + 0.008;
         this.alpha = 1;
-        this.size = Math.random() * (isBrocade ? 1.6 : 1.3) + 1.1; // Crisp, needle-sharp
-        this.twinkle = Math.random() > 0.4;
+        this.size = Math.random() * (isBrocade ? 1.5 : 1.25) + 1.05; // Crisp, delicate streaks
+        this.twinkle = Math.random() > 0.35;
     }
 
     update() {
@@ -133,7 +155,7 @@ class Particle {
         // Incandescent spark head
         if (this.twinkle && this.alpha > 0.3) {
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.size * 0.65, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
             ctx.fill();
         }
@@ -166,7 +188,7 @@ class Rocket {
                 this.y + Math.random() * 12,
                 Math.random() > 0.4 ? '#ffd700' : '#ff4500',
                 (Math.random() - 0.5) * 1.5,
-                Math.random() * 3 + 2, // Falling downward
+                Math.random() * 3 + 2,
                 false
             ));
         }
@@ -177,7 +199,6 @@ class Rocket {
     }
 
     draw() {
-        // Crisp incandescent fiery head
         ctx.beginPath();
         ctx.moveTo(this.lastX, this.lastY);
         ctx.lineTo(this.x, this.y);
@@ -191,7 +212,7 @@ class Rocket {
 
 // Grand Skyrocket Detonation
 function triggerGrandDetonation(x, y) {
-    const palette = COLOR_PALETTES[0]; // Radiant Gold & Amber Fire
+    const palette = COLOR_PALETTES[0]; // Radiant Gold & Saffron
     const starCount = 380; // High-density crisp stars
 
     for (let i = 0; i < starCount; i++) {
@@ -210,9 +231,9 @@ function triggerGrandDetonation(x, y) {
     }
 }
 
-// Crisp Firework Burst (Automatic & Taps)
-function triggerCrispFirework(x, y, volume = 0.7) {
-    // Play authentic single explosion sound for every blast
+// Crisp Firework Burst
+function triggerCrispFirework(x, y, volume = 0.3) {
+    // Play single explosion sound at a controlled volume that never overpowers speech
     playExplosionSound(volume);
 
     const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
@@ -240,10 +261,21 @@ function triggerCrispFirework(x, y, volume = 0.7) {
 function loop() {
     requestAnimationFrame(loop);
 
-    // Trail persistence with subtle fade
+    // Fade trail background
     ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(3, 0, 6, 0.2)';
+    ctx.fillStyle = 'rgba(3, 0, 6, 0.22)';
     ctx.fillRect(0, 0, width, height);
+
+    // Draw subtle celestial background stars
+    for (let i = 0; i < stars.length; i++) {
+        const s = stars[i];
+        s.phase += s.speed;
+        const currentAlpha = s.baseAlpha + Math.sin(s.phase) * 0.2;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 248, 220, ${Math.max(0.08, currentAlpha)})`;
+        ctx.fill();
+    }
 
     // ADDITIVE BLENDING: Natural glowing fire without shadowBlur lag
     ctx.globalCompositeOperation = 'lighter';
@@ -289,11 +321,12 @@ function executeDetonation(x, y) {
     // A. Stop whistle sound cleanly at apex
     stopWhistleSound();
 
-    // B. Play authentic single explosion sound for main detonation
-    playExplosionSound(1.0);
+    // B. Play initial grand explosion sound (punchy opening)
+    playExplosionSound(0.85);
 
-    // C. Start Modi Ji Voice
+    // C. Start Modi Ji Voice at full crisp volume
     try {
+        diwaliAudio.volume = 1.0;
         diwaliAudio.currentTime = 0;
         diwaliAudio.play().catch(e => console.log('Audio autoplay info:', e));
     } catch (e) {}
@@ -317,23 +350,32 @@ function executeDetonation(x, y) {
         celebrationScreen.classList.remove('hidden');
         isCelebration = true;
 
-        // Start Ambient Sky Fireworks with explosion sound
-        startAmbientFireworks();
+        // Start Paced Automatic Fireworks (Slows down after 4-5 cracks)
+        autoCrackCount = 0;
+        scheduleNextAutoFirework();
     }, 250);
 }
 
-// Background Automatic Fireworks (Blasts with single explosion sound)
-function startAmbientFireworks() {
-    if (autoFireworksTimer) clearInterval(autoFireworksTimer);
+// Background Automatic Fireworks: Paced comfortably, slows down after 4-5 cracks
+// to give users space to click and enjoy without rapid repeated spam
+function scheduleNextAutoFirework() {
+    if (!isCelebration) return;
 
-    // Blasts automatically every 1.6s with explosion sound
-    autoFireworksTimer = setInterval(() => {
+    // First 4 cracks: spaced at 2.4s. After 4 cracks: slows down to 6.0s - 7.5s!
+    const delay = (autoCrackCount < 4) ? 2400 : (Math.random() * 1500 + 6000);
+
+    autoFireworksTimer = setTimeout(() => {
         if (!isCelebration) return;
+        autoCrackCount++;
+
         const rx = Math.random() * (width * 0.76) + (width * 0.12);
         const ry = Math.random() * (height * 0.42) + 50;
-        // Automatic blast with explosion sound
-        triggerCrispFirework(rx, ry, 0.45);
-    }, 1600);
+
+        // Subtle volume (0.16) so it never overpowers Modi Ji's speech
+        triggerCrispFirework(rx, ry, 0.16);
+
+        scheduleNextAutoFirework();
+    }, delay);
 }
 
 // ===================================================
@@ -346,10 +388,18 @@ playBtn.addEventListener('click', (e) => {
     startLaunch();
 });
 
-// Tap anywhere on screen to blast crisp fireworks with explosion sound
+// Tap anywhere on screen to blast crisp fireworks
 function handleTap(clientX, clientY) {
     if (!isCelebration) return;
-    triggerCrispFirework(clientX, clientY, 0.75);
+
+    // Immediately hide the tap guide when user interacts
+    if (tapGuide) {
+        tapGuide.style.opacity = '0';
+        tapGuide.style.pointerEvents = 'none';
+    }
+
+    // Tactile user blast (moderate volume 0.32 - crisp but doesn't overpower speech)
+    triggerCrispFirework(clientX, clientY, 0.32);
 }
 
 window.addEventListener('click', (e) => {
@@ -373,8 +423,9 @@ replayBtn.addEventListener('click', (e) => {
     landingScreen.style.display = 'flex';
     landingScreen.classList.remove('vanish');
     isCelebration = false;
+    autoCrackCount = 0;
 
-    if (autoFireworksTimer) clearInterval(autoFireworksTimer);
+    if (autoFireworksTimer) clearTimeout(autoFireworksTimer);
     stopWhistleSound();
 
     try {
@@ -386,4 +437,10 @@ replayBtn.addEventListener('click', (e) => {
     explosionPool.forEach(a => {
         try { a.pause(); a.currentTime = 0; } catch (e) {}
     });
+
+    // Reset tap guide state for replay
+    if (tapGuide) {
+        tapGuide.style.opacity = '';
+        tapGuide.style.pointerEvents = '';
+    }
 });
