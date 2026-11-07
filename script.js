@@ -11,13 +11,13 @@ const flash = document.getElementById('flash');
 const celebrationScreen = document.getElementById('celebrationScreen');
 const replayBtn = document.getElementById('replayBtn');
 const diwaliAudio = document.getElementById('diwaliAudio');
+const whistleAudio = document.getElementById('whistleAudio');
 
 let width, height, dpr;
 let particles = [];
 let rockets = [];
 let isCelebration = false;
 let autoFireworksTimer = null;
-let ambientAudioTimer = null;
 
 // High-DPI Canvas Resizing
 function resizeCanvas() {
@@ -34,173 +34,48 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 // ===================================================
-// PROCEDURAL AUDIO ENGINE: REAL DIWALI SOUNDS
+// AUDIO ENGINE: AUTHENTIC FIREWORK SOUNDS
 // ===================================================
-let audioCtx = null;
 
-function getAudioContext() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-    return audioCtx;
+// Pre-warmed audio pool for polyphonic zero-latency explosion playback
+const EXPLOSION_SRC = 'mixkit-firework-rockets-exploding-in-the-sky-2993.wav';
+const POOL_SIZE = 8;
+const explosionPool = [];
+for (let i = 0; i < POOL_SIZE; i++) {
+    const a = new Audio(EXPLOSION_SRC);
+    a.preload = 'auto';
+    explosionPool.push(a);
+}
+let poolIndex = 0;
+
+// Play Explosion Sound (WAV)
+function playExplosionSound(volume = 1.0) {
+    try {
+        const audio = explosionPool[poolIndex];
+        poolIndex = (poolIndex + 1) % POOL_SIZE;
+        audio.currentTime = 0;
+        audio.volume = Math.min(1.0, Math.max(0.0, volume));
+        audio.play().catch(e => console.warn('Explosion playback note:', e));
+    } catch (e) {}
 }
 
-// 1. Realistic Skyrocket Whistle (Air rush + Screeching Gunpowder Jet)
-function playAuthenticRocketWhistle(duration = 1.35) {
+// Play Whistle Sound (WAV)
+function playWhistleSound() {
     try {
-        const ac = getAudioContext();
-        const now = ac.currentTime;
-
-        // A. Resonant Air Rush Noise (Gunpowder venting through cardboard nozzle)
-        const bufferSize = ac.sampleRate * duration;
-        const noiseBuffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
-        const data = noiseBuffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) {
-            data[i] = Math.random() * 2 - 1;
-        }
-
-        const noiseSrc = ac.createBufferSource();
-        noiseSrc.buffer = noiseBuffer;
-
-        // High-Q Bandpass Filter sweeping upwards
-        const bandpass = ac.createBiquadFilter();
-        bandpass.type = 'bandpass';
-        bandpass.Q.value = 8;
-        bandpass.frequency.setValueAtTime(650, now);
-        bandpass.frequency.exponentialRampToValueAtTime(3600, now + duration);
-
-        const noiseGain = ac.createGain();
-        noiseGain.gain.setValueAtTime(0.01, now);
-        noiseGain.gain.linearRampToValueAtTime(0.28, now + duration * 0.7);
-        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        noiseSrc.connect(bandpass);
-        bandpass.connect(noiseGain);
-        noiseGain.connect(ac.destination);
-
-        noiseSrc.start(now);
-        noiseSrc.stop(now + duration);
-
-        // B. Pure Shrill Whistle Overlap
-        const whistleOsc = ac.createOscillator();
-        const whistleGain = ac.createGain();
-        whistleOsc.type = 'sawtooth';
-        whistleOsc.frequency.setValueAtTime(700, now);
-        whistleOsc.frequency.exponentialRampToValueAtTime(3200, now + duration);
-
-        // Slight frequency jitter
-        const jitter = ac.createOscillator();
-        const jitterGain = ac.createGain();
-        jitter.frequency.value = 35;
-        jitterGain.gain.value = 45;
-        jitter.connect(whistleOsc.frequency);
-        jitter.start(now);
-        jitter.stop(now + duration);
-
-        whistleGain.gain.setValueAtTime(0.01, now);
-        whistleGain.gain.linearRampToValueAtTime(0.18, now + duration * 0.75);
-        whistleGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        whistleOsc.connect(whistleGain);
-        whistleGain.connect(ac.destination);
-
-        whistleOsc.start(now);
-        whistleOsc.stop(now + duration);
-    } catch (e) {
-        console.warn('Audio synthesis note:', e);
-    }
-}
-
-// 2. High-Caliber Aerial Shell Explosion (Sharp Crack + Thunderous Boom)
-function playShellDetonation() {
-    try {
-        const ac = getAudioContext();
-        const now = ac.currentTime;
-
-        // A. Sharp Explosive Acoustic Crack (THWACK)
-        const crackOsc = ac.createOscillator();
-        const crackGain = ac.createGain();
-        crackOsc.type = 'triangle';
-        crackOsc.frequency.setValueAtTime(1400, now);
-        crackOsc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
-        crackGain.gain.setValueAtTime(0.9, now);
-        crackGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
-        crackOsc.connect(crackGain);
-        crackGain.connect(ac.destination);
-        crackOsc.start(now);
-        crackOsc.stop(now + 0.08);
-
-        // B. Thunderous Sub-Bass Punch (DHOOM)
-        const boomOsc = ac.createOscillator();
-        const boomGain = ac.createGain();
-        boomOsc.type = 'sine';
-        boomOsc.frequency.setValueAtTime(150, now);
-        boomOsc.frequency.exponentialRampToValueAtTime(26, now + 2.2);
-        boomGain.gain.setValueAtTime(1.0, now);
-        boomGain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
-        boomOsc.connect(boomGain);
-        boomGain.connect(ac.destination);
-        boomOsc.start(now);
-        boomOsc.stop(now + 2.2);
-
-        // C. Firecracker Crackle Tail
-        playFirecrackerCrackleGroup(now + 0.06, 12);
-    } catch (e) {
-        console.warn('Detonation audio note:', e);
-    }
-}
-
-// 3. Firecracker Crackle Bursts (Ladi / Patakha Crackles)
-function playFirecrackerCrackleGroup(startTime, count = 8) {
-    try {
-        const ac = getAudioContext();
-        for (let i = 0; i < count; i++) {
-            const time = startTime + (i * 0.04) + (Math.random() * 0.03);
-            const osc = ac.createOscillator();
-            const gain = ac.createGain();
-
-            osc.type = Math.random() > 0.5 ? 'triangle' : 'sawtooth';
-            osc.frequency.setValueAtTime(600 + Math.random() * 800, time);
-            osc.frequency.exponentialRampToValueAtTime(80, time + 0.035);
-
-            gain.gain.setValueAtTime(0.22 + Math.random() * 0.15, time);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
-
-            osc.connect(gain);
-            gain.connect(ac.destination);
-
-            osc.start(time);
-            osc.stop(time + 0.035);
+        if (whistleAudio) {
+            whistleAudio.currentTime = 0;
+            whistleAudio.volume = 1.0;
+            whistleAudio.play().catch(e => console.warn('Whistle playback note:', e));
         }
     } catch (e) {}
 }
 
-// 4. Ambient Background Firecrackers (Boom-Boom-Boom & Ladis)
-function playDistantFirecracker() {
+// Stop Whistle Sound
+function stopWhistleSound() {
     try {
-        const ac = getAudioContext();
-        const now = ac.currentTime;
-        const isDeepBoom = Math.random() > 0.45;
-
-        if (isDeepBoom) {
-            // Muffled distant boom (dhum)
-            const osc = ac.createOscillator();
-            const gain = ac.createGain();
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(90 + Math.random() * 30, now);
-            osc.frequency.exponentialRampToValueAtTime(25, now + 0.8);
-            gain.gain.setValueAtTime(0.12, now);
-            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-            osc.connect(gain);
-            gain.connect(ac.destination);
-            osc.start(now);
-            osc.stop(now + 0.8);
-        } else {
-            // Crisp distant crackle cluster
-            playFirecrackerCrackleGroup(now, 5);
+        if (whistleAudio) {
+            whistleAudio.pause();
+            whistleAudio.currentTime = 0;
         }
     } catch (e) {}
 }
@@ -245,7 +120,7 @@ class Particle {
     }
 
     draw() {
-        // High-performance light streak (no shadowBlur lag)
+        // High-performance light streak (hardware accelerated)
         ctx.beginPath();
         ctx.moveTo(this.lastX, this.lastY);
         ctx.lineTo(this.x, this.y);
@@ -321,7 +196,6 @@ function triggerGrandDetonation(x, y) {
 
     for (let i = 0; i < starCount; i++) {
         const angle = Math.random() * Math.PI * 2;
-        // Natural explosive velocity distribution
         const speed = Math.pow(Math.random(), 0.5) * 16 + 2;
         const color = palette[Math.floor(Math.random() * palette.length)];
 
@@ -336,9 +210,11 @@ function triggerGrandDetonation(x, y) {
     }
 }
 
-// Mini Tap / Ambient Burst
-function triggerCrispFirework(x, y) {
-    playFirecrackerCrackleGroup(getAudioContext().currentTime, 4);
+// Crisp Firework Burst (Automatic & Taps)
+function triggerCrispFirework(x, y, volume = 0.7) {
+    // Play authentic single explosion sound for every blast
+    playExplosionSound(volume);
+
     const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
     const count = 75;
 
@@ -401,8 +277,8 @@ loop();
 function startLaunch() {
     landingScreen.classList.add('vanish');
 
-    // 1. Authentic screaming rocket whistle
-    playAuthenticRocketWhistle(1.25);
+    // 1. Play authentic fast whistle sound as rocket ascends
+    playWhistleSound();
 
     // 2. Spawn canvas rocket shooting from bottom center
     const targetY = height * 0.44;
@@ -410,57 +286,54 @@ function startLaunch() {
 }
 
 function executeDetonation(x, y) {
-    // A. Sounds: Acoustic Shell Crack + Sub-Bass + Crackles
-    playShellDetonation();
+    // A. Stop whistle sound cleanly at apex
+    stopWhistleSound();
 
-    // B. Start Modi Ji Voice
+    // B. Play authentic single explosion sound for main detonation
+    playExplosionSound(1.0);
+
+    // C. Start Modi Ji Voice
     try {
         diwaliAudio.currentTime = 0;
         diwaliAudio.play().catch(e => console.log('Audio autoplay info:', e));
     } catch (e) {}
 
-    // C. 380+ Crisp Fireworks Stars
+    // D. 380+ Crisp Fireworks Stars
     triggerGrandDetonation(x, y);
 
-    // D. Visual Skyburst Flash
+    // E. Visual Skyburst Flash
     flash.classList.remove('active');
     void flash.offsetWidth;
     flash.classList.add('active');
 
-    // E. Screen Quake
+    // F. Screen Quake
     document.body.classList.remove('screen-quake');
     void document.body.offsetWidth;
     document.body.classList.add('screen-quake');
 
-    // F. Reveal "HAPPY DIWALI" + Living Dynamic Flame Diya
+    // G. Reveal "HAPPY DIWALI" + Living Dynamic Flame Diya
     setTimeout(() => {
         landingScreen.style.display = 'none';
         celebrationScreen.classList.remove('hidden');
         isCelebration = true;
 
-        // Start Ambient Sky Fireworks & Background Crackle Sounds
-        startFestiveAmbience();
+        // Start Ambient Sky Fireworks with explosion sound
+        startAmbientFireworks();
     }, 250);
 }
 
-// Background Firecrackers & Ambient Sky Fireworks
-function startFestiveAmbience() {
+// Background Automatic Fireworks (Blasts with single explosion sound)
+function startAmbientFireworks() {
     if (autoFireworksTimer) clearInterval(autoFireworksTimer);
-    if (ambientAudioTimer) clearInterval(ambientAudioTimer);
 
-    // Ambient Sky Fireworks Burst every 1.5s
+    // Blasts automatically every 1.6s with explosion sound
     autoFireworksTimer = setInterval(() => {
         if (!isCelebration) return;
         const rx = Math.random() * (width * 0.76) + (width * 0.12);
         const ry = Math.random() * (height * 0.42) + 50;
-        triggerCrispFirework(rx, ry);
-    }, 1500);
-
-    // Background festive firecracker sounds (boom-boom-boom & ladis) every 650ms
-    ambientAudioTimer = setInterval(() => {
-        if (!isCelebration) return;
-        playDistantFirecracker();
-    }, 650);
+        // Automatic blast with explosion sound
+        triggerCrispFirework(rx, ry, 0.45);
+    }, 1600);
 }
 
 // ===================================================
@@ -473,10 +346,10 @@ playBtn.addEventListener('click', (e) => {
     startLaunch();
 });
 
-// Tap anywhere on screen to blast crisp fireworks
+// Tap anywhere on screen to blast crisp fireworks with explosion sound
 function handleTap(clientX, clientY) {
     if (!isCelebration) return;
-    triggerCrispFirework(clientX, clientY);
+    triggerCrispFirework(clientX, clientY, 0.75);
 }
 
 window.addEventListener('click', (e) => {
@@ -502,10 +375,15 @@ replayBtn.addEventListener('click', (e) => {
     isCelebration = false;
 
     if (autoFireworksTimer) clearInterval(autoFireworksTimer);
-    if (ambientAudioTimer) clearInterval(ambientAudioTimer);
+    stopWhistleSound();
 
     try {
         diwaliAudio.pause();
         diwaliAudio.currentTime = 0;
     } catch (e) {}
+
+    // Pause any active explosion sounds
+    explosionPool.forEach(a => {
+        try { a.pause(); a.currentTime = 0; } catch (e) {}
+    });
 });
