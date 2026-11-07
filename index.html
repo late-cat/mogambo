@@ -2,61 +2,96 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>💥</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#030008">
+    <title>Happy Diwali 🪔</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Poppins:wght@600;800&family=Rozha+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Outfit:wght@400;600;800&family=Rozha+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Background Canvas for Nuclear Plasma & Fireworks -->
+    <!-- Full-screen Dynamic Fireworks & Rocket Canvas -->
     <canvas id="canvas"></canvas>
 
-    <!-- White-hot Blinding Flash Overlay for Nuclear Detonation -->
+    <!-- Atomic Detonation Screen Flash -->
     <div id="flash" class="flash-overlay"></div>
 
     <!-- Expanding Plasma Shockwave -->
     <div id="shockwave" class="shockwave"></div>
 
-    <!-- Minimal Meme Landing Screen: ONLY the Play Button -->
+    <!-- Minimal Meme Landing Screen: Pure Clean Play Button -->
     <div id="landingScreen" class="landing-screen">
         <button id="playBtn" class="meme-play-btn" aria-label="Play">
             <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"/>
             </svg>
             <div class="pulse-ring"></div>
+            <div class="pulse-ring delay"></div>
         </button>
     </div>
 
-    <!-- Rocket Projectile with Spark Trail -->
+    <!-- Realistic Rocket Projectile Container (Rendered along with Canvas sparks) -->
     <div id="rocket" class="rocket">
-        <div class="rocket-core">🧨</div>
-        <div class="rocket-fire"></div>
+        <div class="rocket-body">
+            <div class="rocket-tip"></div>
+            <div class="rocket-hull"></div>
+            <div class="rocket-fins"></div>
+            <div class="rocket-stick"></div>
+        </div>
+        <div class="rocket-thruster">
+            <div class="thruster-core"></div>
+            <div class="thruster-glow"></div>
+        </div>
     </div>
 
-    <!-- Celebration Screen: ONLY "HAPPY DIWALI" Stylish Greeting -->
+    <!-- Celebration Screen: "HAPPY DIWALI" + Dynamic Moving Flame Diya -->
     <div id="celebrationScreen" class="celebration-screen hidden">
         <div class="diwali-box">
+            <!-- Stylish Typography -->
             <h1 class="diwali-text">
                 <span class="happy">HAPPY</span>
                 <span class="diwali">DIWALI</span>
             </h1>
-            <div class="flame-diyas">
-                <span class="diya">🪔</span>
-                <span class="sparkle">✨</span>
-                <span class="diya">🪔</span>
+
+            <!-- Dynamic Realistic Diya with Moving Flame -->
+            <div class="diya-wrapper">
+                <div class="diya-aura"></div>
+                <div class="diya-container">
+                    <!-- Dynamic Living Flame -->
+                    <div class="flame-container">
+                        <div class="flame-outer"></div>
+                        <div class="flame-inner"></div>
+                        <div class="flame-core"></div>
+                        <div class="wick"></div>
+                        <!-- Rising Dynamic Spark Embers -->
+                        <div class="ember e1"></div>
+                        <div class="ember e2"></div>
+                        <div class="ember e3"></div>
+                    </div>
+
+                    <!-- Crafted Clay Diya Lamp Base -->
+                    <div class="clay-diya">
+                        <div class="diya-rim"></div>
+                        <div class="diya-oil"></div>
+                        <div class="diya-belly"></div>
+                        <div class="diya-stand"></div>
+                    </div>
+                </div>
             </div>
+
+            <p class="tap-hint">✨ Tap screen for firecracker fireworks ✨</p>
         </div>
 
-        <button id="replayBtn" class="replay-btn" title="Replay">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+        <!-- Replay Button -->
+        <button id="replayBtn" class="replay-btn" aria-label="Replay" title="Replay">
+            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
                 <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
             </svg>
         </button>
     </div>
 
-    <!-- Audio Element for Modi Ji Diwali Voice Message -->
+    <!-- Background Audio: Modi Ji Diwali Wish -->
     <audio id="diwaliAudio" preload="auto">
         <source src="diwali-wish.mp3" type="audio/mpeg">
     </audio>

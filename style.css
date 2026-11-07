@@ -1,5 +1,5 @@
 /* ===================================================
-   💥 MINIMAL MEME DIWALI DHAMAKA STYLES
+   🪔 IMMERSIVE DIWALI MEME & DHAMAKA STYLES (MOBILE-FIRST)
    =================================================== */
 
 * {
@@ -8,26 +8,40 @@
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    -webkit-user-select: none;
+}
+
+:root {
+    --bg-dark: #030008;
+    --gold-bright: #ffd700;
+    --gold-glow: #ffb700;
+    --fire-orange: #ff4500;
+    --fire-red: #ff1100;
 }
 
 html, body {
     width: 100%;
     height: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
     overflow: hidden;
-    background-color: #050109;
-    font-family: 'Poppins', sans-serif;
+    position: fixed;
+    background-color: var(--bg-dark);
+    font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
     color: #ffffff;
+    touch-action: manipulation;
 }
 
-/* Background Canvas */
+/* Dynamic Canvas */
 #canvas {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: 1;
     display: block;
+    pointer-events: none;
 }
 
 /* ===================================================
@@ -40,84 +54,84 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at center, #140722 0%, #050109 85%);
-    transition: opacity 0.4s ease, transform 0.4s ease;
+    background: radial-gradient(circle at center, #150522 0%, #030008 85%);
+    transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
 .landing-screen.vanish {
     opacity: 0;
-    transform: scale(0.92);
+    transform: scale(0.94);
     pointer-events: none;
 }
 
 /* Classic Circular Video Play Button */
 .meme-play-btn {
     position: relative;
-    width: 90px;
-    height: 90px;
+    width: clamp(75px, 18vw, 95px);
+    height: clamp(75px, 18vw, 95px);
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.95);
+    background: rgba(255, 255, 255, 0.96);
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 0 35px rgba(255, 255, 255, 0.4), 0 0 70px rgba(255, 140, 0, 0.35);
-    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.25s ease;
-}
-
-.meme-play-btn:hover {
-    transform: scale(1.12);
-    box-shadow: 0 0 50px rgba(255, 255, 255, 0.6), 0 0 90px rgba(255, 120, 0, 0.55);
+    box-shadow: 0 0 35px rgba(255, 255, 255, 0.35), 0 0 70px rgba(255, 140, 0, 0.3);
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.2s ease;
 }
 
 .meme-play-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.9);
 }
 
-/* Triangle Play Icon */
+@media (hover: hover) {
+    .meme-play-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 45px rgba(255, 255, 255, 0.6), 0 0 90px rgba(255, 120, 0, 0.5);
+    }
+}
+
 .play-icon {
-    width: 38px;
-    height: 38px;
+    width: clamp(32px, 7.5vw, 40px);
+    height: clamp(32px, 7.5vw, 40px);
     color: #0c0214;
     margin-left: 5px; /* Visual optical center for triangle */
-    transition: transform 0.2s ease;
 }
 
-.meme-play-btn:hover .play-icon {
-    transform: scale(1.08);
-}
-
-/* Ambient Pulse Wave */
+/* Expanding Radar Pulse */
 .pulse-ring {
     position: absolute;
     inset: -12px;
     border-radius: 50%;
-    border: 2px solid rgba(255, 255, 255, 0.6);
-    animation: memePulse 2s infinite ease-out;
+    border: 2px solid rgba(255, 255, 255, 0.65);
+    animation: memePulse 2.2s infinite ease-out;
     pointer-events: none;
+}
+
+.pulse-ring.delay {
+    animation-delay: 1.1s;
 }
 
 @keyframes memePulse {
     0% {
-        transform: scale(0.85);
+        transform: scale(0.8);
         opacity: 0.9;
     }
-    50% {
-        opacity: 0.4;
+    60% {
+        opacity: 0.35;
     }
     100% {
-        transform: scale(1.55);
+        transform: scale(1.6);
         opacity: 0;
     }
 }
 
 /* ===================================================
-   2. ROCKET ASCENT WITH SPARK TRAIL
+   2. REALISTIC SKYROCKET PROJECTILE
    =================================================== */
 .rocket {
     position: fixed;
-    bottom: -60px;
+    bottom: -90px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 15;
@@ -130,53 +144,108 @@ html, body {
 
 .rocket.launching {
     opacity: 1;
-    animation: rocketAscend 1.2s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    animation: realisticRocketLaunch 1.25s cubic-bezier(0.2, 0.7, 0.25, 1) forwards;
 }
 
-.rocket-core {
-    font-size: 32px;
-    filter: drop-shadow(0 0 16px #ff7700);
+.rocket-body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.rocket-fire {
-    width: 6px;
-    height: 40px;
-    background: linear-gradient(to bottom, #ffffff, #ffea00, #ff4500, transparent);
+.rocket-tip {
+    width: 0;
+    height: 0;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 22px solid #e61919;
+    filter: drop-shadow(0 0 6px #ff3300);
+}
+
+.rocket-hull {
+    width: 16px;
+    height: 48px;
+    background: linear-gradient(90deg, #b8860b 0%, #ffd700 45%, #b8860b 100%);
+    border-radius: 1px;
+    position: relative;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.4);
+}
+
+.rocket-hull::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: #e61919;
+}
+
+.rocket-stick {
+    width: 3px;
+    height: 65px;
+    background: #8b5a2b;
+    margin-top: -1px;
+}
+
+.rocket-thruster {
+    position: absolute;
+    bottom: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.thruster-core {
+    width: 8px;
+    height: 38px;
+    background: linear-gradient(to bottom, #ffffff 0%, #ffff33 30%, #ff6600 75%, transparent 100%);
     border-radius: 4px;
-    margin-top: -6px;
-    filter: drop-shadow(0 0 10px #ff3b00);
-    animation: rocketFlicker 0.08s infinite alternate;
+    filter: drop-shadow(0 0 12px #ff4500);
+    animation: thrusterFlicker 0.06s infinite alternate;
 }
 
-@keyframes rocketAscend {
+.thruster-glow {
+    position: absolute;
+    top: -5px;
+    width: 28px;
+    height: 45px;
+    background: radial-gradient(circle, rgba(255, 140, 0, 0.8) 0%, transparent 70%);
+    filter: blur(4px);
+    pointer-events: none;
+}
+
+@keyframes realisticRocketLaunch {
     0% {
-        bottom: -50px;
-        transform: translateX(-50%) scale(0.7);
+        bottom: -80px;
+        transform: translateX(-50%) scale(0.65);
+    }
+    30% {
+        transform: translateX(-51%) scale(0.85);
     }
     60% {
         bottom: 25%;
-        transform: translateX(-52%) scale(1);
+        transform: translateX(-49%) scale(1);
     }
     85% {
-        bottom: 40%;
-        transform: translateX(-49%) scale(1.1);
+        bottom: 42%;
+        transform: translateX(-50.5%) scale(1.08);
     }
     100% {
-        bottom: 48%;
-        transform: translateX(-50%) scale(1.2);
+        bottom: 50%;
+        transform: translateX(-50%) scale(1.15);
     }
 }
 
-@keyframes rocketFlicker {
-    0% { height: 35px; opacity: 0.8; }
-    100% { height: 50px; opacity: 1; }
+@keyframes thrusterFlicker {
+    0% { height: 32px; opacity: 0.85; transform: scaleX(0.9); }
+    100% { height: 48px; opacity: 1; transform: scaleX(1.1); }
 }
 
 /* ===================================================
-   3. NUCLEAR PLASMA DETONATION EFFECTS
+   3. NUCLEAR DETONATION & PLASMA SHOCKWAVE
    =================================================== */
-
-/* Blinding White-Hot Flash */
 .flash-overlay {
     position: fixed;
     inset: 0;
@@ -187,7 +256,7 @@ html, body {
 }
 
 .flash-overlay.active {
-    animation: atomicFlash 0.85s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
+    animation: atomicFlash 0.9s cubic-bezier(0.1, 0.9, 0.2, 1) forwards;
 }
 
 @keyframes atomicFlash {
@@ -195,36 +264,35 @@ html, body {
         opacity: 1;
         background: #ffffff;
     }
-    20% {
-        opacity: 0.95;
-        background: radial-gradient(circle, #ffffff 30%, #ffdf79 70%, #ff5500 100%);
+    25% {
+        opacity: 0.9;
+        background: radial-gradient(circle, #ffffff 20%, #ffe066 65%, #ff4400 100%);
     }
-    60% {
-        opacity: 0.5;
+    65% {
+        opacity: 0.45;
     }
     100% {
         opacity: 0;
     }
 }
 
-/* Plasma Shockwave */
 .shockwave {
     position: fixed;
-    top: 48%;
+    top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
-    border: 8px solid rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 40px #ffaa00, inset 0 0 30px #ff3300;
+    border: 10px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 50px #ffbb00, inset 0 0 40px #ff3b00;
     z-index: 22;
     opacity: 0;
     pointer-events: none;
 }
 
 .shockwave.active {
-    animation: shockwaveExpand 0.95s cubic-bezier(0.1, 0.8, 0.25, 1) forwards;
+    animation: shockwaveExpand 1.05s cubic-bezier(0.1, 0.75, 0.25, 1) forwards;
 }
 
 @keyframes shockwaveExpand {
@@ -233,37 +301,36 @@ html, body {
         opacity: 1;
         border-width: 14px;
     }
-    60% {
-        opacity: 0.8;
-        border-width: 6px;
+    50% {
+        opacity: 0.85;
+        border-width: 8px;
     }
     100% {
-        transform: translate(-50%, -50%) scale(40);
+        transform: translate(-50%, -50%) scale(45);
         opacity: 0;
         border-width: 1px;
     }
 }
 
-/* Intense Nuclear Viewport Shake */
+/* Screen Shake Effect */
 body.nuclear-shake {
     animation: screenVibrate 0.85s ease-in-out;
 }
 
 @keyframes screenVibrate {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    10% { transform: translate(-14px, 12px) rotate(-1.5deg); }
-    20% { transform: translate(16px, -14px) rotate(1.8deg); }
-    30% { transform: translate(-12px, -10px) rotate(-1.2deg); }
-    40% { transform: translate(14px, 12px) rotate(1.3deg); }
-    50% { transform: translate(-8px, 6px) rotate(-0.8deg); }
-    60% { transform: translate(7px, -6px) rotate(0.6deg); }
-    70% { transform: translate(-4px, 3px) rotate(-0.3deg); }
-    85% { transform: translate(2px, -2px) rotate(0.1deg); }
-    100% { transform: translate(0, 0) rotate(0deg); }
+    0% { transform: translate(0, 0); }
+    10% { transform: translate(-12px, 10px) rotate(-1.2deg); }
+    20% { transform: translate(14px, -12px) rotate(1.4deg); }
+    30% { transform: translate(-10px, -8px) rotate(-0.9deg); }
+    40% { transform: translate(12px, 10px) rotate(1deg); }
+    50% { transform: translate(-7px, 5px) rotate(-0.6deg); }
+    60% { transform: translate(6px, -5px) rotate(0.4deg); }
+    75% { transform: translate(-3px, 2px); }
+    100% { transform: translate(0, 0); }
 }
 
 /* ===================================================
-   4. CELEBRATION STAGE: ULTRA STYLISH "HAPPY DIWALI"
+   4. CELEBRATION SCREEN: "HAPPY DIWALI" + LIVING DIYA
    =================================================== */
 .celebration-screen {
     position: fixed;
@@ -275,6 +342,7 @@ body.nuclear-shake {
     justify-content: center;
     pointer-events: none;
     opacity: 1;
+    padding: 16px;
     transition: opacity 0.5s ease;
 }
 
@@ -284,15 +352,21 @@ body.nuclear-shake {
 }
 
 .diwali-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
-    animation: heroTitleReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    width: 100%;
+    max-width: 650px;
+    animation: diwaliReveal 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-@keyframes heroTitleReveal {
+@keyframes diwaliReveal {
     0% {
-        transform: scale(0.6) translateY(40px);
+        transform: scale(0.7) translateY(30px);
         opacity: 0;
-        filter: blur(15px);
+        filter: blur(12px);
     }
     100% {
         transform: scale(1) translateY(0);
@@ -301,70 +375,307 @@ body.nuclear-shake {
     }
 }
 
+/* Ultra-Crisp Responsive Typography */
 .diwali-text {
     font-family: 'Cinzel', serif;
-    font-size: clamp(3rem, 9.5vw, 7.5rem);
+    font-size: clamp(2.8rem, 11vw, 6.2rem);
     font-weight: 900;
-    letter-spacing: clamp(4px, 1.2vw, 12px);
+    letter-spacing: clamp(4px, 1.4vw, 10px);
     line-height: 1.08;
     text-transform: uppercase;
-    margin-bottom: 12px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 .diwali-text .happy {
     display: block;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FFF1B0 50%, #FFD700 100%);
+    background: linear-gradient(180deg, #FFFFFF 0%, #FFF5BD 45%, #FFD700 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 30px rgba(255, 215, 0, 0.7), 0 0 60px rgba(255, 140, 0, 0.4);
-    filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.8));
+    filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.75)) drop-shadow(0 4px 15px rgba(0, 0, 0, 0.9));
 }
 
 .diwali-text .diwali {
     display: block;
-    background: linear-gradient(180deg, #FFF6D6 0%, #FFA500 45%, #FF3D00 100%);
+    background: linear-gradient(180deg, #FFF9E0 0%, #FFA500 45%, #FF2600 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 35px rgba(255, 69, 0, 0.8), 0 0 75px rgba(255, 0, 80, 0.5);
-    filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.9));
-    animation: diwaliGlowBreathing 2.4s infinite alternate ease-in-out;
+    filter: drop-shadow(0 0 35px rgba(255, 60, 0, 0.85)) drop-shadow(0 0 70px rgba(255, 160, 0, 0.6));
+    animation: diwaliBreathingGlow 2.5s infinite alternate ease-in-out;
 }
 
-@keyframes diwaliGlowBreathing {
+@keyframes diwaliBreathingGlow {
     0% {
-        filter: drop-shadow(0 0 25px rgba(255, 120, 0, 0.7));
+        filter: drop-shadow(0 0 25px rgba(255, 70, 0, 0.7));
     }
     100% {
-        filter: drop-shadow(0 0 55px rgba(255, 60, 0, 1)) drop-shadow(0 0 90px rgba(255, 200, 0, 0.8));
+        filter: drop-shadow(0 0 50px rgba(255, 50, 0, 1)) drop-shadow(0 0 80px rgba(255, 200, 0, 0.8));
     }
 }
 
-.flame-diyas {
+/* ===================================================
+   5. DYNAMIC LIVING FLAME & REALISTIC CLAY DIYA
+   =================================================== */
+.diya-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px 0 22px 0;
+}
+
+/* Radial Warm Ambient Light Cast by Flame */
+.diya-aura {
+    position: absolute;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 170, 0, 0.35) 0%, rgba(255, 68, 0, 0.15) 45%, transparent 70%);
+    filter: blur(15px);
+    animation: auraBreathe 1.8s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes auraBreathe {
+    0% { transform: scale(0.9); opacity: 0.7; }
+    100% { transform: scale(1.15); opacity: 1; }
+}
+
+.diya-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: scale(clamp(0.85, 2vw + 0.65, 1.15));
+}
+
+/* --- THE LIVING DYNAMIC FLAME --- */
+.flame-container {
+    position: relative;
+    width: 32px;
+    height: 58px;
+    margin-bottom: -6px;
+    z-index: 5;
     display: flex;
     justify-content: center;
+    filter: drop-shadow(0 -5px 15px rgba(255, 140, 0, 0.95));
+}
+
+/* Outer Flame: Vibrant Orange-Red with Organic Sway */
+.flame-outer {
+    position: absolute;
+    bottom: 8px;
+    width: 26px;
+    height: 48px;
+    background: linear-gradient(to top, rgba(255, 34, 0, 0.95) 0%, #ff7700 55%, #ffe600 95%);
+    border-radius: 50% 50% 20% 20% / 65% 65% 35% 35%;
+    transform-origin: center bottom;
+    box-shadow: 0 0 20px #ff5500, 0 0 40px #ffaa00;
+    animation: flameDynamicSway 1.6s infinite ease-in-out;
+}
+
+/* Inner Flame: Golden Yellow with High-Speed Flicker */
+.flame-inner {
+    position: absolute;
+    bottom: 9px;
+    width: 17px;
+    height: 34px;
+    background: linear-gradient(to top, #ff8800 0%, #ffea00 65%, #ffffff 100%);
+    border-radius: 50% 50% 25% 25% / 65% 65% 35% 35%;
+    transform-origin: center bottom;
+    animation: flameInnerFlicker 0.12s infinite alternate ease-in-out;
+}
+
+/* Core Flame: Intense White-Hot Core */
+.flame-core {
+    position: absolute;
+    bottom: 9px;
+    width: 9px;
+    height: 18px;
+    background: #ffffff;
+    border-radius: 50% 50% 30% 30% / 65% 65% 35% 35%;
+    box-shadow: 0 0 8px #ffffff;
+    transform-origin: center bottom;
+    animation: flameCorePulse 0.4s infinite alternate ease-in-out;
+}
+
+/* Cotton Wick */
+.wick {
+    position: absolute;
+    bottom: 2px;
+    width: 3px;
+    height: 10px;
+    background: #2b1d0c;
+    border-radius: 2px;
+    z-index: 4;
+}
+
+/* Organic Natural Sway & Flutter Keyframes */
+@keyframes flameDynamicSway {
+    0% {
+        transform: rotate(-1.5deg) skewX(-1.5deg) scaleY(0.97);
+    }
+    25% {
+        transform: rotate(2.5deg) skewX(2deg) scaleY(1.04);
+    }
+    50% {
+        transform: rotate(-2deg) skewX(-2deg) scaleY(0.96);
+    }
+    75% {
+        transform: rotate(1.8deg) skewX(1.5deg) scaleY(1.02);
+    }
+    100% {
+        transform: rotate(-1.5deg) skewX(-1.5deg) scaleY(0.97);
+    }
+}
+
+@keyframes flameInnerFlicker {
+    0% {
+        transform: scale(0.96, 0.95) translateX(-0.5px);
+        opacity: 0.9;
+    }
+    100% {
+        transform: scale(1.04, 1.05) translateX(0.5px);
+        opacity: 1;
+    }
+}
+
+@keyframes flameCorePulse {
+    0% { transform: scaleY(0.9); opacity: 0.85; }
+    100% { transform: scaleY(1.1); opacity: 1; }
+}
+
+/* Rising Spark Embers from Flame */
+.ember {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ffea00;
+    box-shadow: 0 0 6px #ff7700;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.e1 {
+    left: 12px;
+    bottom: 30px;
+    animation: emberRise 1.8s infinite ease-out 0.2s;
+}
+
+.e2 {
+    right: 11px;
+    bottom: 26px;
+    animation: emberRise 2.1s infinite ease-out 0.8s;
+}
+
+.e3 {
+    left: 15px;
+    bottom: 34px;
+    animation: emberRise 1.6s infinite ease-out 1.3s;
+}
+
+@keyframes emberRise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        opacity: 0.6;
+        transform: translateY(-24px) translateX(6px) scale(0.8);
+    }
+    100% {
+        transform: translateY(-50px) translateX(-4px) scale(0);
+        opacity: 0;
+    }
+}
+
+/* --- CRAFTED CLAY DIYA LAMP BASE --- */
+.clay-diya {
+    position: relative;
+    width: 96px;
+    height: 36px;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 16px;
-    font-size: clamp(24px, 4vw, 36px);
-    margin-top: 8px;
-    animation: diyaFloat 2.5s infinite alternate ease-in-out;
 }
 
-@keyframes diyaFloat {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-8px); }
+/* Diya Top Rim with Gold Trim */
+.diya-rim {
+    width: 94px;
+    height: 12px;
+    background: linear-gradient(90deg, #96350f 0%, #f59e0b 50%, #96350f 100%);
+    border-radius: 50%;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255, 235, 150, 0.6);
+    z-index: 2;
 }
 
-/* Minimal Replay Button */
+/* Inner Oil Pool Reflection */
+.diya-oil {
+    position: absolute;
+    top: 2px;
+    width: 76px;
+    height: 7px;
+    background: radial-gradient(ellipse, #ffd700 0%, #b45309 65%, #78350f 100%);
+    border-radius: 50%;
+    z-index: 3;
+    opacity: 0.85;
+}
+
+/* Terracotta Belly Curve */
+.diya-belly {
+    position: absolute;
+    top: 6px;
+    width: 90px;
+    height: 25px;
+    background: linear-gradient(180deg, #b45309 0%, #852d0b 60%, #521803 100%);
+    border-radius: 0 0 50px 50px;
+    box-shadow: inset 0 -3px 8px rgba(0,0,0,0.7), 0 6px 14px rgba(0,0,0,0.85);
+    z-index: 1;
+}
+
+/* Small Ornamental Base Stand */
+.diya-stand {
+    position: absolute;
+    bottom: 2px;
+    width: 38px;
+    height: 5px;
+    background: linear-gradient(90deg, #78350f 0%, #d97706 50%, #78350f 100%);
+    border-radius: 3px;
+    z-index: 0;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.9);
+}
+
+/* Interactive Hint Text */
+.tap-hint {
+    font-size: clamp(0.75rem, 2.8vw, 0.95rem);
+    color: rgba(255, 220, 150, 0.7);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-top: 6px;
+    animation: hintGlow 2s infinite alternate ease-in-out;
+}
+
+@keyframes hintGlow {
+    0% { opacity: 0.5; }
+    100% { opacity: 0.95; }
+}
+
+/* ===================================================
+   6. MINIMAL REPLAY BUTTON (MOBILE FRIENDLY)
+   =================================================== */
 .replay-btn {
     position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 44px;
-    height: 44px;
+    bottom: max(20px, env(safe-area-inset-bottom, 20px));
+    right: max(20px, env(safe-area-inset-right, 20px));
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.25);
     color: #ffffff;
     cursor: pointer;
@@ -372,16 +683,19 @@ body.nuclear-shake {
     align-items: center;
     justify-content: center;
     pointer-events: auto;
-    transition: all 0.2s ease;
-    opacity: 0.65;
-}
-
-.replay-btn:hover {
-    opacity: 1;
-    transform: rotate(45deg) scale(1.1);
-    background: rgba(255, 255, 255, 0.22);
+    transition: transform 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+    opacity: 0.7;
+    z-index: 30;
 }
 
 .replay-btn:active {
-    transform: rotate(180deg) scale(0.95);
+    transform: rotate(180deg) scale(0.92);
+}
+
+@media (hover: hover) {
+    .replay-btn:hover {
+        opacity: 1;
+        transform: rotate(45deg) scale(1.08);
+        background: rgba(255, 255, 255, 0.22);
+    }
 }
