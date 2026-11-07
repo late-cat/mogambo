@@ -145,28 +145,26 @@ class CoreFlash {
     }
 }
 
-// Floating Shimmering Ember (Dancing dust left in the wake of stars)
-class FloatingEmber {
-    constructor(x, y, color) {
-        this.x = x + (Math.random() - 0.5) * 2;
-        this.y = y + (Math.random() - 0.5) * 2;
+// Real Pyrotechnic Dropping Spark (Drops straight down under gravity along the flight path)
+class TrailingSpark {
+    constructor(x, y, vx, vy, color) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx * 0.15;
+        this.vy = vy * 0.15 + 0.4;
         this.color = color;
-        this.vx = (Math.random() - 0.5) * 0.4;
-        this.vy = Math.random() * 0.4 + 0.12; // Gently drifting downward
         this.life = 0;
-        this.maxLife = Math.random() * 18 + 22;
+        this.maxLife = Math.random() * 12 + 15;
         this.alpha = 1;
-        this.flickerSpeed = Math.random() * 0.4 + 0.25;
     }
 
     update() {
         this.life++;
+        this.vy += 0.07; // Natural gravity drop
+        this.vx *= 0.95; // Aerodynamic drag
         this.x += this.vx;
         this.y += this.vy;
-        const progress = this.life / this.maxLife;
-        // Organic shimmer as it dies out
-        const twinkle = 0.55 + 0.45 * Math.sin(this.life * this.flickerSpeed);
-        this.alpha = Math.max(0, (1 - progress) * twinkle);
+        this.alpha = Math.max(0, 1 - (this.life / this.maxLife));
     }
 
     draw() {
@@ -174,14 +172,14 @@ class FloatingEmber {
         ctx.save();
         ctx.globalAlpha = this.alpha;
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 0.95, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, 0.85, 0, Math.PI * 2);
         ctx.fillStyle = this.color;
         ctx.fill();
         ctx.restore();
     }
 }
 
-// Physics-Driven Aerial Shell Star
+// Pure Hyper-Realistic Pyrotechnic Shell Star (True Newtonian Ballistics)
 class PhysicsStar {
     constructor(x, y, vx, vy, color, isWillow = false, isPistil = false) {
         this.x = x;
@@ -192,16 +190,15 @@ class PhysicsStar {
         this.isWillow = isWillow;
         this.isPistil = isPistil;
 
-        // Aerodynamic Drag: High initial burst -> Rapid drag deceleration -> Graceful float
-        this.drag = isWillow ? 0.942 : 0.932;
-        this.gravity = isWillow ? 0.082 : 0.076;
-        this.driftSeed = Math.random() * 100;
+        // True Newtonian Ballistics: Clean drag deceleration and gravity
+        this.drag = isWillow ? 0.958 : 0.946;
+        this.gravity = isWillow ? 0.088 : 0.082;
 
         this.life = 0;
-        this.maxLife = isWillow ? (Math.random() * 22 + 70) : (Math.random() * 16 + 48);
+        this.maxLife = isWillow ? (Math.random() * 24 + 65) : (Math.random() * 16 + 42);
         this.alpha = 1;
 
-        // Tapered light trail
+        // Clean ballistic trail
         this.trail = [{ x, y }];
         this.maxTrail = isWillow ? 6 : 4;
         this.size = isWillow ? 1.45 : 1.2;
@@ -210,33 +207,26 @@ class PhysicsStar {
     update() {
         this.life++;
 
-        // Save trail history
+        // Save trail position
         this.trail.unshift({ x: this.x, y: this.y });
         if (this.trail.length > this.maxTrail) {
             this.trail.pop();
         }
 
-        // 1. Aerodynamic drag cushions the outward blast smoothly
+        // Pure physical ballistics: drag and gravity ONLY (Zero wobble)
         this.vx *= this.drag;
         this.vy *= this.drag;
-
-        // 2. Gravitational curve (smoothly arches downward)
         this.vy += this.gravity;
 
-        // 3. Subtle organic air breeze ("dancing" motion in the sky)
-        const turbulence = Math.sin(this.life * 0.14 + this.driftSeed) * 0.24;
-        this.vx += turbulence;
-
-        // 4. Update coordinates
         this.x += this.vx;
         this.y += this.vy;
 
-        // 5. Shedding burning embers (creates golden shimmering cascade)
-        if (this.isWillow && this.life > 8 && Math.random() < 0.42 && this.alpha > 0.25) {
-            embers.push(new FloatingEmber(this.x, this.y, this.color));
+        // Shedding hot pyrotechnic sparks directly along the trajectory
+        if (this.isWillow && this.life > 6 && Math.random() < 0.35 && this.alpha > 0.3) {
+            embers.push(new TrailingSpark(this.x, this.y, this.vx, this.vy, this.color));
         }
 
-        // 6. Smooth non-linear burnout (zero ghost lines)
+        // Smooth non-linear burnout (clean extinction)
         const progress = this.life / this.maxLife;
         if (progress > 0.55) {
             this.alpha = Math.max(0, 1 - (progress - 0.55) / 0.45);
@@ -249,7 +239,7 @@ class PhysicsStar {
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.alpha);
 
-        // Draw graceful tapered light trail
+        // Razor-sharp ballistic comet streak
         ctx.beginPath();
         ctx.moveTo(this.trail[0].x, this.trail[0].y);
         for (let i = 1; i < this.trail.length; i++) {
@@ -258,6 +248,19 @@ class PhysicsStar {
         ctx.strokeStyle = this.color;
         ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Incandescent glowing burning pellet head
+        if (this.alpha > 0.28) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.75, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+}
         ctx.stroke();
 
         // Incandescent glowing star head
