@@ -283,9 +283,11 @@ class Rocket {
 
         // Trailing sparks along rocket flight path
         for (let i = 0; i < 3; i++) {
-            embers.push(new FloatingEmber(
+            embers.push(new TrailingSpark(
                 this.x + (Math.random() - 0.5) * 4,
                 this.y + Math.random() * 10,
+                (Math.random() - 0.5) * 1.5,
+                Math.random() * 2 + 1,
                 Math.random() > 0.4 ? '#ffd700' : '#ff4500'
             ));
         }
