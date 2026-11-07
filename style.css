@@ -12,7 +12,7 @@
 }
 
 :root {
-    --bg: #0d0d0d;
+    --bg: #050505;
     --gold-1: #fff7d6;
     --gold-2: #ffd700;
     --gold-3: #ff9900;
@@ -26,7 +26,7 @@ html, body {
     min-height: 100dvh;
     overflow: hidden;
     position: fixed;
-    background: radial-gradient(ellipse at 50% 25%, #1e1e1e 0%, #131313 55%, #0c0c0c 100%);
+    background: #050505;
     font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     color: #ffffff;
     touch-action: manipulation;
@@ -53,9 +53,11 @@ html, body {
     height: 100%;
     background: linear-gradient(
         to bottom,
-        rgba(12, 12, 12, 0.88) 0%,
-        rgba(16, 16, 16, 0.58) 42%,
-        rgba(20, 20, 20, 0.16) 75%,
+        #050505 0%,
+        #050505 45%,
+        rgba(5, 5, 5, 0.85) 55%,
+        rgba(5, 5, 5, 0.25) 65%,
+        transparent 75%,
         transparent 100%
     );
     pointer-events: none;
@@ -83,7 +85,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at center, #232323 0%, #151515 50%, #0d0d0d 90%);
+    background: #050505;
     transition: opacity 0.35s ease, transform 0.35s ease;
 }
 
