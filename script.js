@@ -261,19 +261,6 @@ class PhysicsStar {
         ctx.restore();
     }
 }
-        ctx.stroke();
-
-        // Incandescent glowing star head
-        if (this.alpha > 0.3) {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 0.75, 0, Math.PI * 2);
-            ctx.fillStyle = '#ffffff';
-            ctx.fill();
-        }
-
-        ctx.restore();
-    }
-}
 
 // Canvas-Based Realistic Rocket Projectile
 class Rocket {
