@@ -3,95 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#030008">
     <title>Happy Diwali 🪔</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@800;900&family=Outfit:wght@400;600;800&family=Rozha+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Full-screen Dynamic Fireworks & Rocket Canvas -->
+    <!-- Hardware-Accelerated 60FPS Fireworks Canvas -->
     <canvas id="canvas"></canvas>
 
-    <!-- Atomic Detonation Screen Flash -->
+    <!-- Sudden Skyburst Flash -->
     <div id="flash" class="flash-overlay"></div>
 
-    <!-- Expanding Plasma Shockwave -->
-    <div id="shockwave" class="shockwave"></div>
-
-    <!-- Minimal Meme Landing Screen: Pure Clean Play Button -->
+    <!-- Minimalist Meme Landing Screen: Sleek Play Button -->
     <div id="landingScreen" class="landing-screen">
-        <button id="playBtn" class="meme-play-btn" aria-label="Play">
+        <button id="playBtn" class="play-btn" aria-label="Play">
             <svg class="play-icon" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M8 5v14l11-7z"/>
             </svg>
-            <div class="pulse-ring"></div>
-            <div class="pulse-ring delay"></div>
+            <div class="btn-ripple"></div>
         </button>
     </div>
 
-    <!-- Realistic Rocket Projectile Container (Rendered along with Canvas sparks) -->
-    <div id="rocket" class="rocket">
-        <div class="rocket-body">
-            <div class="rocket-tip"></div>
-            <div class="rocket-hull"></div>
-            <div class="rocket-fins"></div>
-            <div class="rocket-stick"></div>
-        </div>
-        <div class="rocket-thruster">
-            <div class="thruster-core"></div>
-            <div class="thruster-glow"></div>
-        </div>
-    </div>
-
-    <!-- Celebration Screen: "HAPPY DIWALI" + Dynamic Moving Flame Diya -->
+    <!-- Celebration Screen: Typography + Dynamic Living Diya -->
     <div id="celebrationScreen" class="celebration-screen hidden">
-        <div class="diwali-box">
-            <!-- Stylish Typography -->
-            <h1 class="diwali-text">
-                <span class="happy">HAPPY</span>
-                <span class="diwali">DIWALI</span>
+        <div class="greeting-container">
+            <!-- Polished Gold Typography -->
+            <h1 class="diwali-heading">
+                <span class="text-happy">HAPPY</span>
+                <span class="text-diwali">DIWALI</span>
             </h1>
 
-            <!-- Dynamic Realistic Diya with Moving Flame -->
-            <div class="diya-wrapper">
-                <div class="diya-aura"></div>
-                <div class="diya-container">
+            <!-- Aesthetic Handcrafted Diya with Living Dynamic Flame -->
+            <div class="diya-stage">
+                <!-- Warm Ambient Light Pool -->
+                <div class="diya-light-pool"></div>
+
+                <div class="diya-artwork">
                     <!-- Dynamic Living Flame -->
-                    <div class="flame-container">
-                        <div class="flame-outer"></div>
-                        <div class="flame-inner"></div>
-                        <div class="flame-core"></div>
+                    <div class="flame-wrap">
+                        <div class="flame-halo"></div>
+                        <div class="flame-body"></div>
+                        <div class="flame-amber"></div>
+                        <div class="flame-white-core"></div>
                         <div class="wick"></div>
-                        <!-- Rising Dynamic Spark Embers -->
-                        <div class="ember e1"></div>
-                        <div class="ember e2"></div>
-                        <div class="ember e3"></div>
+                        <div class="flame-spark fs1"></div>
+                        <div class="flame-spark fs2"></div>
                     </div>
 
-                    <!-- Crafted Clay Diya Lamp Base -->
-                    <div class="clay-diya">
-                        <div class="diya-rim"></div>
-                        <div class="diya-oil"></div>
-                        <div class="diya-belly"></div>
-                        <div class="diya-stand"></div>
-                    </div>
+                    <!-- Brass & Terracotta Ornate Diya SVG -->
+                    <svg class="diya-svg" viewBox="0 0 160 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#8a3c00"/>
+                                <stop offset="25%" stop-color="#e58e26"/>
+                                <stop offset="50%" stop-color="#ffd369"/>
+                                <stop offset="75%" stop-color="#e58e26"/>
+                                <stop offset="100%" stop-color="#8a3c00"/>
+                            </linearGradient>
+                            <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#b35400"/>
+                                <stop offset="50%" stop-color="#fff1b8"/>
+                                <stop offset="100%" stop-color="#b35400"/>
+                            </linearGradient>
+                            <radialGradient id="oilGrad" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffbe33"/>
+                                <stop offset="70%" stop-color="#994000"/>
+                                <stop offset="100%" stop-color="#4d1a00"/>
+                            </radialGradient>
+                            <filter id="diyaShadow" x="-20%" y="-20%" width="140%" height="150%">
+                                <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.8"/>
+                            </filter>
+                        </defs>
+                        <!-- Base Stand -->
+                        <ellipse cx="80" cy="62" rx="36" ry="6" fill="#5c2600" opacity="0.9"/>
+                        <path d="M62 58 Q80 65 98 58 L94 54 Q80 57 66 54 Z" fill="url(#brassGrad)"/>
+                        <!-- Diya Belly Bowl -->
+                        <path d="M12 28 C12 55 52 60 80 60 C108 60 148 55 148 28 C148 22 135 24 80 24 C25 24 12 22 12 28 Z" fill="url(#brassGrad)" filter="url(#diyaShadow)"/>
+                        <!-- Traditional Engraved Ornamentation -->
+                        <path d="M28 34 Q80 46 132 34" stroke="#5c2600" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.65"/>
+                        <circle cx="80" cy="42" r="3" fill="#ffe082"/>
+                        <circle cx="60" cy="40" r="2.2" fill="#ffe082"/>
+                        <circle cx="100" cy="40" r="2.2" fill="#ffe082"/>
+                        <circle cx="44" cy="37" r="1.8" fill="#ffe082"/>
+                        <circle cx="116" cy="37" r="1.8" fill="#ffe082"/>
+                        <!-- Top Rim -->
+                        <ellipse cx="80" cy="25" rx="68" ry="11" fill="url(#rimGrad)"/>
+                        <!-- Oil Pool -->
+                        <ellipse cx="80" cy="25" rx="58" ry="8" fill="url(#oilGrad)"/>
+                    </svg>
                 </div>
             </div>
 
-            <p class="tap-hint">✨ Tap screen for firecracker fireworks ✨</p>
+            <!-- Crisp Tap Hint -->
+            <p class="tap-guide">Tap anywhere to blast fireworks 💥</p>
         </div>
 
-        <!-- Replay Button -->
+        <!-- Sleek Floating Replay Button -->
         <button id="replayBtn" class="replay-btn" aria-label="Replay" title="Replay">
-            <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22">
-                <path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                <path d="M3 3v5h5"/>
             </svg>
         </button>
     </div>
 
-    <!-- Background Audio: Modi Ji Diwali Wish -->
+    <!-- Hidden Audio: Modi Ji Diwali Wish -->
     <audio id="diwaliAudio" preload="auto">
         <source src="diwali-wish.mp3" type="audio/mpeg">
     </audio>

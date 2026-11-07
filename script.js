@@ -1,5 +1,5 @@
 // ===================================================
-// 🪔 IMMERSIVE DIWALI FIREWORKS & SKYROCKET ENGINE
+// 🪔 HARDWARE-ACCELERATED AESTHETIC DIWALI ENGINE
 // ===================================================
 
 const canvas = document.getElementById('canvas');
@@ -7,24 +7,21 @@ const ctx = canvas.getContext('2d');
 
 const landingScreen = document.getElementById('landingScreen');
 const playBtn = document.getElementById('playBtn');
-const rocket = document.getElementById('rocket');
 const flash = document.getElementById('flash');
-const shockwave = document.getElementById('shockwave');
 const celebrationScreen = document.getElementById('celebrationScreen');
 const replayBtn = document.getElementById('replayBtn');
 const diwaliAudio = document.getElementById('diwaliAudio');
 
 let width, height, dpr;
 let particles = [];
-let rocketSparks = [];
-let activeRockets = [];
+let rockets = [];
 let isCelebration = false;
 let autoFireworksTimer = null;
-let rocketAscentRaf = null;
+let ambientAudioTimer = null;
 
-// High-DPI Canvas Resizing for Crisp Mobile Rendering
+// High-DPI Canvas Resizing
 function resizeCanvas() {
-    dpr = window.devicePixelRatio || 1;
+    dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for optimal 60fps performance
     width = window.innerWidth;
     height = window.innerHeight;
     canvas.width = width * dpr;
@@ -37,7 +34,7 @@ window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
 // ===================================================
-// PROCEDURAL AUDIO SYNTHESIZER
+// PROCEDURAL AUDIO ENGINE: REAL DIWALI SOUNDS
 // ===================================================
 let audioCtx = null;
 
@@ -51,401 +48,389 @@ function getAudioContext() {
     return audioCtx;
 }
 
-// 1. Screaming Rocket Whistle
-function playRocketWhistle(duration = 1.25) {
+// 1. Realistic Skyrocket Whistle (Air rush + Screeching Gunpowder Jet)
+function playAuthenticRocketWhistle(duration = 1.35) {
     try {
         const ac = getAudioContext();
         const now = ac.currentTime;
 
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(450, now);
-        osc.frequency.exponentialRampToValueAtTime(3200, now + duration);
-
-        // Rocket flutter vibrato
-        const mod = ac.createOscillator();
-        const modGain = ac.createGain();
-        mod.frequency.value = 40;
-        modGain.gain.value = 55;
-        mod.connect(osc.frequency);
-        mod.start(now);
-        mod.stop(now + duration);
-
-        gain.gain.setValueAtTime(0.01, now);
-        gain.gain.linearRampToValueAtTime(0.3, now + duration * 0.75);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-        osc.connect(gain);
-        gain.connect(ac.destination);
-
-        osc.start(now);
-        osc.stop(now + duration);
-    } catch (e) {
-        console.warn('Audio synthesis info:', e);
-    }
-}
-
-// 2. High-Caliber Aerial Shell Detonation (Sharp Pop + Thunder Sub-Bass)
-function playAerialShellBlast() {
-    try {
-        const ac = getAudioContext();
-        const now = ac.currentTime;
-
-        // A. Sharp Explosive Crack / Pop
-        const popOsc = ac.createOscillator();
-        const popGain = ac.createGain();
-        popOsc.type = 'triangle';
-        popOsc.frequency.setValueAtTime(1200, now);
-        popOsc.frequency.exponentialRampToValueAtTime(50, now + 0.1);
-        popGain.gain.setValueAtTime(0.85, now);
-        popGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-        popOsc.connect(popGain);
-        popGain.connect(ac.destination);
-        popOsc.start(now);
-        popOsc.stop(now + 0.1);
-
-        // B. Thunderous Sub-Bass Boom
-        const boomOsc = ac.createOscillator();
-        const boomGain = ac.createGain();
-        boomOsc.type = 'sine';
-        boomOsc.frequency.setValueAtTime(160, now);
-        boomOsc.frequency.exponentialRampToValueAtTime(26, now + 2.5);
-        boomGain.gain.setValueAtTime(1.0, now);
-        boomGain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
-        boomOsc.connect(boomGain);
-        boomGain.connect(ac.destination);
-        boomOsc.start(now);
-        boomOsc.stop(now + 2.5);
-
-        // C. Firework Crackle Body (White noise with low-pass envelope)
-        const bufferSize = ac.sampleRate * 2.2;
+        // A. Resonant Air Rush Noise (Gunpowder venting through cardboard nozzle)
+        const bufferSize = ac.sampleRate * duration;
         const noiseBuffer = ac.createBuffer(1, bufferSize, ac.sampleRate);
         const data = noiseBuffer.getChannelData(0);
         for (let i = 0; i < bufferSize; i++) {
             data[i] = Math.random() * 2 - 1;
         }
 
-        const whiteNoise = ac.createBufferSource();
-        whiteNoise.buffer = noiseBuffer;
+        const noiseSrc = ac.createBufferSource();
+        noiseSrc.buffer = noiseBuffer;
 
-        const filter = ac.createBiquadFilter();
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1600, now);
-        filter.frequency.exponentialRampToValueAtTime(70, now + 2.2);
+        // High-Q Bandpass Filter sweeping upwards
+        const bandpass = ac.createBiquadFilter();
+        bandpass.type = 'bandpass';
+        bandpass.Q.value = 8;
+        bandpass.frequency.setValueAtTime(650, now);
+        bandpass.frequency.exponentialRampToValueAtTime(3600, now + duration);
 
         const noiseGain = ac.createGain();
-        noiseGain.gain.setValueAtTime(0.8, now);
-        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+        noiseGain.gain.setValueAtTime(0.01, now);
+        noiseGain.gain.linearRampToValueAtTime(0.28, now + duration * 0.7);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-        whiteNoise.connect(filter);
-        filter.connect(noiseGain);
+        noiseSrc.connect(bandpass);
+        bandpass.connect(noiseGain);
         noiseGain.connect(ac.destination);
 
-        whiteNoise.start(now);
-        whiteNoise.stop(now + 2.2);
+        noiseSrc.start(now);
+        noiseSrc.stop(now + duration);
+
+        // B. Pure Shrill Whistle Overlap
+        const whistleOsc = ac.createOscillator();
+        const whistleGain = ac.createGain();
+        whistleOsc.type = 'sawtooth';
+        whistleOsc.frequency.setValueAtTime(700, now);
+        whistleOsc.frequency.exponentialRampToValueAtTime(3200, now + duration);
+
+        // Slight frequency jitter
+        const jitter = ac.createOscillator();
+        const jitterGain = ac.createGain();
+        jitter.frequency.value = 35;
+        jitterGain.gain.value = 45;
+        jitter.connect(whistleOsc.frequency);
+        jitter.start(now);
+        jitter.stop(now + duration);
+
+        whistleGain.gain.setValueAtTime(0.01, now);
+        whistleGain.gain.linearRampToValueAtTime(0.18, now + duration * 0.75);
+        whistleGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        whistleOsc.connect(whistleGain);
+        whistleGain.connect(ac.destination);
+
+        whistleOsc.start(now);
+        whistleOsc.stop(now + duration);
     } catch (e) {
-        console.warn('Audio blast info:', e);
+        console.warn('Audio synthesis note:', e);
     }
 }
 
-// 3. Mini Tap Pop Sound
-function playMiniPop() {
+// 2. High-Caliber Aerial Shell Explosion (Sharp Crack + Thunderous Boom)
+function playShellDetonation() {
     try {
         const ac = getAudioContext();
         const now = ac.currentTime;
-        const osc = ac.createOscillator();
-        const gain = ac.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(400 + Math.random() * 250, now);
-        osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
-        gain.gain.setValueAtTime(0.3, now);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-        osc.connect(gain);
-        gain.connect(ac.destination);
-        osc.start(now);
-        osc.stop(now + 0.12);
+
+        // A. Sharp Explosive Acoustic Crack (THWACK)
+        const crackOsc = ac.createOscillator();
+        const crackGain = ac.createGain();
+        crackOsc.type = 'triangle';
+        crackOsc.frequency.setValueAtTime(1400, now);
+        crackOsc.frequency.exponentialRampToValueAtTime(45, now + 0.08);
+        crackGain.gain.setValueAtTime(0.9, now);
+        crackGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+        crackOsc.connect(crackGain);
+        crackGain.connect(ac.destination);
+        crackOsc.start(now);
+        crackOsc.stop(now + 0.08);
+
+        // B. Thunderous Sub-Bass Punch (DHOOM)
+        const boomOsc = ac.createOscillator();
+        const boomGain = ac.createGain();
+        boomOsc.type = 'sine';
+        boomOsc.frequency.setValueAtTime(150, now);
+        boomOsc.frequency.exponentialRampToValueAtTime(26, now + 2.2);
+        boomGain.gain.setValueAtTime(1.0, now);
+        boomGain.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+        boomOsc.connect(boomGain);
+        boomGain.connect(ac.destination);
+        boomOsc.start(now);
+        boomOsc.stop(now + 2.2);
+
+        // C. Firecracker Crackle Tail
+        playFirecrackerCrackleGroup(now + 0.06, 12);
+    } catch (e) {
+        console.warn('Detonation audio note:', e);
+    }
+}
+
+// 3. Firecracker Crackle Bursts (Ladi / Patakha Crackles)
+function playFirecrackerCrackleGroup(startTime, count = 8) {
+    try {
+        const ac = getAudioContext();
+        for (let i = 0; i < count; i++) {
+            const time = startTime + (i * 0.04) + (Math.random() * 0.03);
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+
+            osc.type = Math.random() > 0.5 ? 'triangle' : 'sawtooth';
+            osc.frequency.setValueAtTime(600 + Math.random() * 800, time);
+            osc.frequency.exponentialRampToValueAtTime(80, time + 0.035);
+
+            gain.gain.setValueAtTime(0.22 + Math.random() * 0.15, time);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + 0.035);
+
+            osc.connect(gain);
+            gain.connect(ac.destination);
+
+            osc.start(time);
+            osc.stop(time + 0.035);
+        }
+    } catch (e) {}
+}
+
+// 4. Ambient Background Firecrackers (Boom-Boom-Boom & Ladis)
+function playDistantFirecracker() {
+    try {
+        const ac = getAudioContext();
+        const now = ac.currentTime;
+        const isDeepBoom = Math.random() > 0.45;
+
+        if (isDeepBoom) {
+            // Muffled distant boom (dhum)
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(90 + Math.random() * 30, now);
+            osc.frequency.exponentialRampToValueAtTime(25, now + 0.8);
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+            osc.connect(gain);
+            gain.connect(ac.destination);
+            osc.start(now);
+            osc.stop(now + 0.8);
+        } else {
+            // Crisp distant crackle cluster
+            playFirecrackerCrackleGroup(now, 5);
+        }
     } catch (e) {}
 }
 
 // ===================================================
-// PARTICLE ENGINE: AERIAL SHELL & WILLOW TRAILS
+// PARTICLE ENGINE: CRISP, LUMINOUS FIREWORK STREAKS
 // ===================================================
 
-const FESTIVE_PALETTES = [
-    ['#ffffff', '#fff275', '#ff9f1c', '#ff3838', '#ffd700'], // Gold & Fire
-    ['#00f5d4', '#7b2cbf', '#ff007f', '#ffffff', '#ffd700'], // Electric Diwali
-    ['#ff0055', '#ff5400', '#ffbd00', '#39ff14', '#00e5ff'], // Multicolored Carnival
-    ['#ff99c8', '#fcf6bd', '#d0f4de', '#a9def9', '#e4c1f9']  // Pastel Glow
+const COLOR_PALETTES = [
+    ['#ffffff', '#fff275', '#ffd700', '#ff9f1c', '#ff3838'], // Golden Flame
+    ['#00f5d4', '#7b2cbf', '#ff007f', '#ffffff', '#fee440'], // Electric Festive
+    ['#ff0055', '#ff5400', '#ffd000', '#39ff14', '#00e5ff'], // Sparkling Carnival
+    ['#ff99c8', '#fcf6bd', '#d0f4de', '#a9def9', '#ffffff']  // Diamond Glow
 ];
 
-class ShellStar {
-    constructor(x, y, color, velocity, isWillow = false) {
+class Particle {
+    constructor(x, y, color, vx, vy, isBrocade = false) {
         this.x = x;
         this.y = y;
+        this.lastX = x;
+        this.lastY = y;
         this.color = color;
-        this.velocity = velocity;
+        this.vx = vx;
+        this.vy = vy;
+        this.friction = isBrocade ? 0.965 : 0.955;
+        this.gravity = isBrocade ? 0.065 : 0.085;
+        this.decay = Math.random() * (isBrocade ? 0.012 : 0.02) + 0.009;
         this.alpha = 1;
-        this.friction = isWillow ? 0.965 : 0.95;
-        this.gravity = isWillow ? 0.055 : 0.075;
-        this.decay = Math.random() * (isWillow ? 0.009 : 0.018) + 0.006;
-        this.radius = Math.random() * (isWillow ? 3.5 : 2.5) + 1.2;
-        this.trail = [];
-        this.maxTrail = isWillow ? 7 : 4;
-        this.sparkle = Math.random() > 0.3;
-    }
-
-    draw() {
-        // Draw trailing spark line
-        if (this.trail.length > 1) {
-            ctx.save();
-            ctx.beginPath();
-            ctx.moveTo(this.trail[0].x, this.trail[0].y);
-            for (let i = 1; i < this.trail.length; i++) {
-                ctx.lineTo(this.trail[i].x, this.trail[i].y);
-            }
-            ctx.strokeStyle = this.color;
-            ctx.lineWidth = this.radius * 0.8;
-            ctx.lineCap = 'round';
-            ctx.globalAlpha = this.alpha * 0.6;
-            ctx.shadowBlur = this.sparkle ? 12 : 5;
-            ctx.shadowColor = this.color;
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        // Draw star head
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = this.sparkle ? 16 : 8;
-        ctx.shadowColor = this.color;
-        ctx.fill();
-        ctx.restore();
+        this.size = Math.random() * (isBrocade ? 1.6 : 1.3) + 1.1; // Crisp, needle-sharp
+        this.twinkle = Math.random() > 0.4;
     }
 
     update() {
-        this.trail.unshift({ x: this.x, y: this.y });
-        if (this.trail.length > this.maxTrail) {
-            this.trail.pop();
-        }
-
-        this.velocity.x *= this.friction;
-        this.velocity.y *= this.friction;
-        this.velocity.y += this.gravity;
-        this.x += this.velocity.x;
-        this.y += this.velocity.y;
-        this.alpha -= this.decay;
-    }
-}
-
-// Rocket Thruster Spark Class
-class ThrusterSpark {
-    constructor(x, y) {
-        this.x = x + (Math.random() - 0.5) * 8;
-        this.y = y;
-        this.vx = (Math.random() - 0.5) * 2.5;
-        this.vy = Math.random() * 4 + 2; // Spews downward
-        this.alpha = 1;
-        this.decay = Math.random() * 0.04 + 0.03;
-        this.radius = Math.random() * 2.5 + 1;
-        this.color = Math.random() > 0.4 ? '#ffcc00' : '#ff4500';
-    }
-
-    draw() {
-        ctx.save();
-        ctx.globalAlpha = this.alpha;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = this.color;
-        ctx.fill();
-        ctx.restore();
-    }
-
-    update() {
+        this.lastX = this.x;
+        this.lastY = this.y;
+        this.vx *= this.friction;
+        this.vy *= this.friction;
+        this.vy += this.gravity;
         this.x += this.vx;
         this.y += this.vy;
         this.alpha -= this.decay;
     }
-}
 
-// Realistic Double-Shell Skyrocket Detonation
-function detonateGrandSkyrocket(x, y) {
-    const palette = FESTIVE_PALETTES[0]; // Radiant Gold & Amber Fire
-    const willowCount = 280;
-    const coreCount = 180;
+    draw() {
+        // High-performance light streak (no shadowBlur lag)
+        ctx.beginPath();
+        ctx.moveTo(this.lastX, this.lastY);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = this.color;
+        ctx.lineWidth = this.size;
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = Math.max(0, this.alpha);
+        ctx.stroke();
 
-    // 1. Golden Brocade Willow Stars (Outer graceful arching trails)
-    for (let i = 0; i < willowCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.pow(Math.random(), 0.5) * 16 + 2.5;
-        const color = Math.random() > 0.25 ? '#ffd700' : '#ffffff';
-
-        particles.push(new ShellStar(
-            x,
-            y,
-            color,
-            {
-                x: Math.cos(angle) * speed,
-                y: Math.sin(angle) * speed
-            },
-            true
-        ));
-    }
-
-    // 2. High-Velocity Inner Fireball (Vibrant orange/ruby blast core)
-    for (let i = 0; i < coreCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 11 + 1;
-        const color = palette[Math.floor(Math.random() * palette.length)];
-
-        particles.push(new ShellStar(
-            x,
-            y,
-            color,
-            {
-                x: Math.cos(angle) * speed,
-                y: Math.sin(angle) * speed
-            },
-            false
-        ));
+        // Incandescent spark head
+        if (this.twinkle && this.alpha > 0.3) {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+        }
     }
 }
 
-// Mini Tap / Ambient Fireworks Burst
-function triggerFireworkBurst(x, y) {
-    playMiniPop();
-    const palette = FESTIVE_PALETTES[Math.floor(Math.random() * FESTIVE_PALETTES.length)];
-    const count = Math.min(85, Math.floor(width / 6));
-
-    for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 8 + 1.2;
-        const color = palette[Math.floor(Math.random() * palette.length)];
-
-        particles.push(new ShellStar(
-            x,
-            y,
-            color,
-            {
-                x: Math.cos(angle) * speed,
-                y: Math.sin(angle) * speed
-            },
-            false
-        ));
+// Canvas-Based Realistic Rocket Projectile
+class Rocket {
+    constructor(startX, startY, targetX, targetY) {
+        this.x = startX;
+        this.y = startY;
+        this.lastX = startX;
+        this.lastY = startY;
+        this.targetY = targetY;
+        this.speed = 17;
+        this.acceleration = 1.015;
+        this.isDead = false;
     }
-}
 
-// ===================================================
-// CANVAS MAIN ANIMATION LOOP
-// ===================================================
-function animate() {
-    requestAnimationFrame(animate);
+    update() {
+        this.lastX = this.x;
+        this.lastY = this.y;
+        this.y -= this.speed;
+        this.speed *= this.acceleration;
 
-    // Dark trails fade
-    ctx.fillStyle = 'rgba(3, 0, 8, 0.22)';
-    ctx.fillRect(0, 0, width, height);
+        // Emit realistic trailing sparks along flight path
+        for (let i = 0; i < 3; i++) {
+            particles.push(new Particle(
+                this.x + (Math.random() - 0.5) * 4,
+                this.y + Math.random() * 12,
+                Math.random() > 0.4 ? '#ffd700' : '#ff4500',
+                (Math.random() - 0.5) * 1.5,
+                Math.random() * 3 + 2, // Falling downward
+                false
+            ));
+        }
 
-    // Update & draw thruster sparks
-    for (let i = rocketSparks.length - 1; i >= 0; i--) {
-        const s = rocketSparks[i];
-        s.draw();
-        s.update();
-        if (s.alpha <= 0) {
-            rocketSparks.splice(i, 1);
+        if (this.y <= this.targetY) {
+            this.isDead = true;
         }
     }
 
-    // Update & draw shell fireworks particles
+    draw() {
+        // Crisp incandescent fiery head
+        ctx.beginPath();
+        ctx.moveTo(this.lastX, this.lastY);
+        ctx.lineTo(this.x, this.y);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2.4;
+        ctx.lineCap = 'round';
+        ctx.globalAlpha = 1;
+        ctx.stroke();
+    }
+}
+
+// Grand Skyrocket Detonation
+function triggerGrandDetonation(x, y) {
+    const palette = COLOR_PALETTES[0]; // Radiant Gold & Amber Fire
+    const starCount = 380; // High-density crisp stars
+
+    for (let i = 0; i < starCount; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        // Natural explosive velocity distribution
+        const speed = Math.pow(Math.random(), 0.5) * 16 + 2;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+
+        particles.push(new Particle(
+            x,
+            y,
+            color,
+            Math.cos(angle) * speed,
+            Math.sin(angle) * speed,
+            true
+        ));
+    }
+}
+
+// Mini Tap / Ambient Burst
+function triggerCrispFirework(x, y) {
+    playFirecrackerCrackleGroup(getAudioContext().currentTime, 4);
+    const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
+    const count = 75;
+
+    for (let i = 0; i < count; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 9 + 1.2;
+        const color = palette[Math.floor(Math.random() * palette.length)];
+
+        particles.push(new Particle(
+            x,
+            y,
+            color,
+            Math.cos(angle) * speed,
+            Math.sin(angle) * speed,
+            false
+        ));
+    }
+}
+
+// ===================================================
+// HARDWARE-ACCELERATED RENDER LOOP (60-120 FPS)
+// ===================================================
+function loop() {
+    requestAnimationFrame(loop);
+
+    // Trail persistence with subtle fade
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'rgba(3, 0, 6, 0.2)';
+    ctx.fillRect(0, 0, width, height);
+
+    // ADDITIVE BLENDING: Natural glowing fire without shadowBlur lag
+    ctx.globalCompositeOperation = 'lighter';
+
+    // 1. Update & Draw Rockets
+    for (let i = rockets.length - 1; i >= 0; i--) {
+        const r = rockets[i];
+        r.update();
+        r.draw();
+        if (r.isDead) {
+            rockets.splice(i, 1);
+            executeDetonation(r.x, r.targetY);
+        }
+    }
+
+    // 2. Update & Draw Particles
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
-        p.draw();
         p.update();
+        p.draw();
         if (p.alpha <= 0) {
             particles.splice(i, 1);
         }
     }
 }
-animate();
+loop();
 
 // ===================================================
-// ROCKET FLIGHT & EMBER TRAIL EMITTER
+// LAUNCH & DETONATION FLOW
 // ===================================================
-function emitRocketTrail() {
-    if (!rocket.classList.contains('launching')) return;
-
-    // Track the physical position of the rocket element on screen
-    const rect = rocket.getBoundingClientRect();
-    const thrusterX = rect.left + rect.width / 2;
-    const thrusterY = rect.bottom - 45;
-
-    // Spawn hot fire sparks trailing from thruster
-    for (let i = 0; i < 4; i++) {
-        rocketSparks.push(new ThrusterSpark(thrusterX, thrusterY));
-    }
-
-    rocketAscentRaf = requestAnimationFrame(emitRocketTrail);
-}
-
-// ===================================================
-// LAUNCH SEQUENCE ENGINE
-// ===================================================
-function startLaunchSequence() {
-    // 1. Hide Play Button
+function startLaunch() {
     landingScreen.classList.add('vanish');
 
-    // 2. Play Screaming Rocket Whistle
-    playRocketWhistle(1.25);
+    // 1. Authentic screaming rocket whistle
+    playAuthenticRocketWhistle(1.25);
 
-    // 3. Launch Rocket Projectile
-    rocket.classList.add('launching');
-    emitRocketTrail();
-
-    // 4. Detonate at Rocket Apex (1.25 seconds)
-    setTimeout(() => {
-        detonateApexBlast();
-    }, 1250);
+    // 2. Spawn canvas rocket shooting from bottom center
+    const targetY = height * 0.44;
+    rockets.push(new Rocket(width / 2, height + 10, width / 2, targetY));
 }
 
-function detonateApexBlast() {
-    // Stop rocket animation and spark trail
-    if (rocketAscentRaf) cancelAnimationFrame(rocketAscentRaf);
-    rocket.classList.remove('launching');
+function executeDetonation(x, y) {
+    // A. Sounds: Acoustic Shell Crack + Sub-Bass + Crackles
+    playShellDetonation();
 
-    // Apex detonation coordinates: upper center
-    const blastX = width / 2;
-    const blastY = height * 0.50;
-
-    // A. Sounds: Sharp Aerial Shell Crack + Thunder Sub-Bass
-    playAerialShellBlast();
-
-    // B. Start Modi Ji Audio Message
+    // B. Start Modi Ji Voice
     try {
         diwaliAudio.currentTime = 0;
         diwaliAudio.play().catch(e => console.log('Audio autoplay info:', e));
     } catch (e) {}
 
-    // C. 460+ Particle Aerial Shell & Brocade Willow Blast
-    detonateGrandSkyrocket(blastX, blastY);
+    // C. 380+ Crisp Fireworks Stars
+    triggerGrandDetonation(x, y);
 
-    // D. Blinding Flash & Expanding Shockwave
+    // D. Visual Skyburst Flash
     flash.classList.remove('active');
     void flash.offsetWidth;
     flash.classList.add('active');
 
-    shockwave.classList.remove('active');
-    void shockwave.offsetWidth;
-    shockwave.classList.add('active');
-
-    // E. Screen Vibration
-    document.body.classList.remove('nuclear-shake');
+    // E. Screen Quake
+    document.body.classList.remove('screen-quake');
     void document.body.offsetWidth;
-    document.body.classList.add('nuclear-shake');
+    document.body.classList.add('screen-quake');
 
     // F. Reveal "HAPPY DIWALI" + Living Dynamic Flame Diya
     setTimeout(() => {
@@ -453,52 +438,62 @@ function detonateApexBlast() {
         celebrationScreen.classList.remove('hidden');
         isCelebration = true;
 
-        // Start Ambient Fireworks
-        startAmbientFireworks();
-    }, 280);
+        // Start Ambient Sky Fireworks & Background Crackle Sounds
+        startFestiveAmbience();
+    }, 250);
 }
 
-function startAmbientFireworks() {
+// Background Firecrackers & Ambient Sky Fireworks
+function startFestiveAmbience() {
     if (autoFireworksTimer) clearInterval(autoFireworksTimer);
+    if (ambientAudioTimer) clearInterval(ambientAudioTimer);
+
+    // Ambient Sky Fireworks Burst every 1.5s
     autoFireworksTimer = setInterval(() => {
         if (!isCelebration) return;
-        const rx = Math.random() * (width * 0.78) + (width * 0.11);
-        const ry = Math.random() * (height * 0.45) + 60;
-        triggerFireworkBurst(rx, ry);
-    }, 1400);
+        const rx = Math.random() * (width * 0.76) + (width * 0.12);
+        const ry = Math.random() * (height * 0.42) + 50;
+        triggerCrispFirework(rx, ry);
+    }, 1500);
+
+    // Background festive firecracker sounds (boom-boom-boom & ladis) every 650ms
+    ambientAudioTimer = setInterval(() => {
+        if (!isCelebration) return;
+        playDistantFirecracker();
+    }, 650);
 }
 
 // ===================================================
-// USER INTERACTIONS & TOUCH CONTROLS
+// USER INTERACTIONS
 // ===================================================
 
 // Click / Tap Play Button
 playBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    startLaunchSequence();
+    startLaunch();
 });
 
-// Tap anywhere on screen to trigger tactile fireworks
-function handleScreenTap(clientX, clientY) {
+// Tap anywhere on screen to blast crisp fireworks
+function handleTap(clientX, clientY) {
     if (!isCelebration) return;
-    triggerFireworkBurst(clientX, clientY);
+    triggerCrispFirework(clientX, clientY);
 }
 
 window.addEventListener('click', (e) => {
     if (e.target.closest('#replayBtn') || e.target.closest('#playBtn')) return;
-    handleScreenTap(e.clientX, e.clientY);
+    handleTap(e.clientX, e.clientY);
 });
 
-// Multi-touch support for mobile devices
+// Multi-touch for mobile
 window.addEventListener('touchstart', (e) => {
     if (e.target.closest('#replayBtn') || e.target.closest('#playBtn')) return;
     for (let i = 0; i < e.touches.length; i++) {
-        const touch = e.touches[i];
-        handleScreenTap(touch.clientX, touch.clientY);
+        const t = e.touches[i];
+        handleTap(t.clientX, t.clientY);
     }
 }, { passive: true });
 
-// Replay Entire Sequence
+// Replay Button
 replayBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     celebrationScreen.classList.add('hidden');
@@ -507,7 +502,7 @@ replayBtn.addEventListener('click', (e) => {
     isCelebration = false;
 
     if (autoFireworksTimer) clearInterval(autoFireworksTimer);
-    if (rocketAscentRaf) cancelAnimationFrame(rocketAscentRaf);
+    if (ambientAudioTimer) clearInterval(ambientAudioTimer);
 
     try {
         diwaliAudio.pause();
