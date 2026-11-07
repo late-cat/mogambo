@@ -35,18 +35,18 @@ function resizeCanvas() {
     initStars();
 }
 
-// Subtle Twinkling Night Stars in the Sky
+// Minimalist Subtle Twinkling Stars strictly in the upper night sky
 function initStars() {
     stars = [];
-    const starCount = Math.floor(Math.min(width, height) / 10);
+    const starCount = 20; // Minimalist count (strictly in upper sky)
     for (let i = 0; i < starCount; i++) {
         stars.push({
             x: Math.random() * width,
-            y: Math.random() * (height * 0.7),
-            r: Math.random() * 1.1 + 0.3,
-            baseAlpha: Math.random() * 0.5 + 0.15,
+            y: Math.random() * (height * 0.30), // Strictly top 30% of screen
+            r: Math.random() * 0.85 + 0.3,
+            baseAlpha: Math.random() * 0.35 + 0.15,
             phase: Math.random() * Math.PI * 2,
-            speed: Math.random() * 0.02 + 0.008
+            speed: Math.random() * 0.015 + 0.005
         });
     }
 }
@@ -117,48 +117,65 @@ class Particle {
     constructor(x, y, color, vx, vy, isBrocade = false) {
         this.x = x;
         this.y = y;
-        this.lastX = x;
-        this.lastY = y;
         this.color = color;
         this.vx = vx;
         this.vy = vy;
-        this.friction = isBrocade ? 0.966 : 0.956;
-        this.gravity = isBrocade ? 0.062 : 0.082;
-        this.decay = Math.random() * (isBrocade ? 0.011 : 0.019) + 0.008;
+        this.friction = isBrocade ? 0.962 : 0.952;
+        this.gravity = isBrocade ? 0.07 : 0.088;
+        this.decay = Math.random() * (isBrocade ? 0.014 : 0.024) + 0.012;
         this.alpha = 1;
-        this.size = Math.random() * (isBrocade ? 1.5 : 1.25) + 1.05; // Crisp, delicate streaks
-        this.twinkle = Math.random() > 0.35;
+        this.size = Math.random() * (isBrocade ? 1.45 : 1.2) + 1.0;
+        this.trail = [{ x, y }];
+        this.maxTrail = isBrocade ? 5 : 3;
+        this.twinkle = Math.random() > 0.4;
     }
 
     update() {
-        this.lastX = this.x;
-        this.lastY = this.y;
+        this.trail.unshift({ x: this.x, y: this.y });
+        if (this.trail.length > this.maxTrail) {
+            this.trail.pop();
+        }
+
         this.vx *= this.friction;
         this.vy *= this.friction;
         this.vy += this.gravity;
         this.x += this.vx;
         this.y += this.vy;
-        this.alpha -= this.decay;
+
+        // Smooth accelerated fade out near end-of-life to guarantee ZERO ghost stacking
+        if (this.alpha < 0.35) {
+            this.alpha -= this.decay * 2.2;
+        } else {
+            this.alpha -= this.decay;
+        }
     }
 
     draw() {
-        // High-performance light streak (hardware accelerated)
+        if (this.alpha <= 0.03 || this.trail.length < 2) return;
+
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.alpha);
+
+        // Clean light streak
         ctx.beginPath();
-        ctx.moveTo(this.lastX, this.lastY);
-        ctx.lineTo(this.x, this.y);
+        ctx.moveTo(this.trail[0].x, this.trail[0].y);
+        for (let i = 1; i < this.trail.length; i++) {
+            ctx.lineTo(this.trail[i].x, this.trail[i].y);
+        }
         ctx.strokeStyle = this.color;
         ctx.lineWidth = this.size;
         ctx.lineCap = 'round';
-        ctx.globalAlpha = Math.max(0, this.alpha);
         ctx.stroke();
 
-        // Incandescent spark head
-        if (this.twinkle && this.alpha > 0.3) {
+        // Incandescent spark head only while vibrant
+        if (this.twinkle && this.alpha > 0.45) {
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 0.65, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
             ctx.fill();
         }
+
+        ctx.restore();
     }
 }
 
@@ -261,26 +278,24 @@ function triggerCrispFirework(x, y, volume = 0.3) {
 function loop() {
     requestAnimationFrame(loop);
 
-    // Fade trail background
-    ctx.globalCompositeOperation = 'source-over';
-    ctx.fillStyle = 'rgba(3, 0, 6, 0.22)';
-    ctx.fillRect(0, 0, width, height);
+    // 1. Crystal clear frame wipe (zero ghosting, transparent over city backdrop)
+    ctx.clearRect(0, 0, width, height);
 
-    // Draw subtle celestial background stars
+    // 2. Additive blending for luminous firework glow
+    ctx.globalCompositeOperation = 'lighter';
+
+    // 3. Draw minimalist upper-sky twinkling stars (strictly top 30%)
     for (let i = 0; i < stars.length; i++) {
         const s = stars[i];
         s.phase += s.speed;
-        const currentAlpha = s.baseAlpha + Math.sin(s.phase) * 0.2;
+        const currentAlpha = s.baseAlpha + Math.sin(s.phase) * 0.18;
         ctx.beginPath();
         ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(255, 248, 220, ${Math.max(0.08, currentAlpha)})`;
         ctx.fill();
     }
 
-    // ADDITIVE BLENDING: Natural glowing fire without shadowBlur lag
-    ctx.globalCompositeOperation = 'lighter';
-
-    // 1. Update & Draw Rockets
+    // 4. Update & Draw Rockets
     for (let i = rockets.length - 1; i >= 0; i--) {
         const r = rockets[i];
         r.update();
@@ -291,7 +306,7 @@ function loop() {
         }
     }
 
-    // 2. Update & Draw Particles
+    // 5. Update & Draw Particles (clean vanish with zero stacking)
     for (let i = particles.length - 1; i >= 0; i--) {
         const p = particles[i];
         p.update();
