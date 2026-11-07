@@ -1,5 +1,5 @@
 // ===================================================
-// 🪔 HARDWARE-ACCELERATED AESTHETIC DIWALI ENGINE
+// 🪔 REAL-PHYSICS AESTHETIC DIWALI FIREWORKS ENGINE
 // ===================================================
 
 const canvas = document.getElementById('canvas');
@@ -15,9 +15,11 @@ const whistleAudio = document.getElementById('whistleAudio');
 const tapGuide = document.getElementById('tapGuide');
 
 let width, height, dpr;
-let particles = [];
-let rockets = [];
 let stars = [];
+let rockets = [];
+let physicsStars = [];
+let embers = [];
+let coreFlashes = [];
 let isCelebration = false;
 let autoFireworksTimer = null;
 let autoCrackCount = 0;
@@ -35,10 +37,10 @@ function resizeCanvas() {
     initStars();
 }
 
-// Minimalist Subtle Twinkling Stars strictly in the upper night sky
+// Minimalist, Subtle Twinkling Stars strictly in the upper night sky
 function initStars() {
     stars = [];
-    const starCount = 20; // Minimalist count (strictly in upper sky)
+    const starCount = 20; // Minimalist (strictly in upper sky)
     for (let i = 0; i < starCount; i++) {
         stars.push({
             x: Math.random() * width,
@@ -58,7 +60,6 @@ resizeCanvas();
 // AUDIO ENGINE: BALANCED DIWALI SOUNDS
 // ===================================================
 
-// Pre-warmed audio pool for polyphonic zero-latency explosion playback
 const EXPLOSION_SRC = 'mixkit-firework-rockets-exploding-in-the-sky-2993.wav';
 const POOL_SIZE = 8;
 const explosionPool = [];
@@ -69,7 +70,6 @@ for (let i = 0; i < POOL_SIZE; i++) {
 }
 let poolIndex = 0;
 
-// Play Explosion Sound (WAV) - Kept balanced to never overpower Modi Ji's voice
 function playExplosionSound(volume = 0.3) {
     try {
         const audio = explosionPool[poolIndex];
@@ -80,7 +80,6 @@ function playExplosionSound(volume = 0.3) {
     } catch (e) {}
 }
 
-// Play Whistle Sound (WAV)
 function playWhistleSound() {
     try {
         if (whistleAudio) {
@@ -91,7 +90,6 @@ function playWhistleSound() {
     } catch (e) {}
 }
 
-// Stop Whistle Sound
 function stopWhistleSound() {
     try {
         if (whistleAudio) {
@@ -102,61 +100,156 @@ function stopWhistleSound() {
 }
 
 // ===================================================
-// PARTICLE ENGINE: AESTHETIC TRADITIONAL WARM COLORS
-// (No artificial AI cyan/neon blue - strictly authentic Diwali)
+// AUTHENTIC DIWALI COLOR PALETTES
 // ===================================================
 
 const COLOR_PALETTES = [
-    ['#ffffff', '#fff9d6', '#ffd700', '#fdbb2d', '#f46b45'], // Royal Gold & Saffron Flame
+    ['#ffffff', '#fff8db', '#ffd700', '#fdbb2d', '#f46b45'], // Royal Gold & Saffron Flame
     ['#ffffff', '#ffe066', '#ff5722', '#e50914', '#ffd700'], // Radiant Crimson & Sunset Amber
     ['#ffffff', '#fff5cc', '#ffd700', '#00c853', '#69f0ae'], // Festive Emerald & Gold Brocade
     ['#ffffff', '#ffab00', '#ff3d00', '#d50000', '#ffc107']  // Shimmering Ruby & Gold
 ];
 
-class Particle {
-    constructor(x, y, color, vx, vy, isBrocade = false) {
+// ===================================================
+// REAL-PHYSICS AERIAL FIREWORK PARTICLES
+// ===================================================
+
+// Core Burst Flash
+class CoreFlash {
+    constructor(x, y, color) {
         this.x = x;
         this.y = y;
         this.color = color;
-        this.vx = vx;
-        this.vy = vy;
-        this.friction = isBrocade ? 0.962 : 0.952;
-        this.gravity = isBrocade ? 0.07 : 0.088;
-        this.decay = Math.random() * (isBrocade ? 0.014 : 0.024) + 0.012;
-        this.alpha = 1;
-        this.size = Math.random() * (isBrocade ? 1.45 : 1.2) + 1.0;
-        this.trail = [{ x, y }];
-        this.maxTrail = isBrocade ? 5 : 3;
-        this.twinkle = Math.random() > 0.4;
+        this.radius = 24;
+        this.alpha = 0.95;
     }
 
     update() {
+        this.radius += 5;
+        this.alpha -= 0.14;
+    }
+
+    draw() {
+        if (this.alpha <= 0) return;
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        const grad = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.radius);
+        grad.addColorStop(0, '#ffffff');
+        grad.addColorStop(0.35, this.color);
+        grad.addColorStop(1, 'transparent');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+// Floating Shimmering Ember (Dancing dust left in the wake of stars)
+class FloatingEmber {
+    constructor(x, y, color) {
+        this.x = x + (Math.random() - 0.5) * 2;
+        this.y = y + (Math.random() - 0.5) * 2;
+        this.color = color;
+        this.vx = (Math.random() - 0.5) * 0.4;
+        this.vy = Math.random() * 0.4 + 0.12; // Gently drifting downward
+        this.life = 0;
+        this.maxLife = Math.random() * 18 + 22;
+        this.alpha = 1;
+        this.flickerSpeed = Math.random() * 0.4 + 0.25;
+    }
+
+    update() {
+        this.life++;
+        this.x += this.vx;
+        this.y += this.vy;
+        const progress = this.life / this.maxLife;
+        // Organic shimmer as it dies out
+        const twinkle = 0.55 + 0.45 * Math.sin(this.life * this.flickerSpeed);
+        this.alpha = Math.max(0, (1 - progress) * twinkle);
+    }
+
+    draw() {
+        if (this.alpha <= 0.03) return;
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 0.95, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+// Physics-Driven Aerial Shell Star
+class PhysicsStar {
+    constructor(x, y, vx, vy, color, isWillow = false, isPistil = false) {
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.color = color;
+        this.isWillow = isWillow;
+        this.isPistil = isPistil;
+
+        // Aerodynamic Drag: High initial burst -> Rapid drag deceleration -> Graceful float
+        this.drag = isWillow ? 0.942 : 0.932;
+        this.gravity = isWillow ? 0.082 : 0.076;
+        this.driftSeed = Math.random() * 100;
+
+        this.life = 0;
+        this.maxLife = isWillow ? (Math.random() * 22 + 70) : (Math.random() * 16 + 48);
+        this.alpha = 1;
+
+        // Tapered light trail
+        this.trail = [{ x, y }];
+        this.maxTrail = isWillow ? 6 : 4;
+        this.size = isWillow ? 1.45 : 1.2;
+    }
+
+    update() {
+        this.life++;
+
+        // Save trail history
         this.trail.unshift({ x: this.x, y: this.y });
         if (this.trail.length > this.maxTrail) {
             this.trail.pop();
         }
 
-        this.vx *= this.friction;
-        this.vy *= this.friction;
+        // 1. Aerodynamic drag cushions the outward blast smoothly
+        this.vx *= this.drag;
+        this.vy *= this.drag;
+
+        // 2. Gravitational curve (smoothly arches downward)
         this.vy += this.gravity;
+
+        // 3. Subtle organic air breeze ("dancing" motion in the sky)
+        const turbulence = Math.sin(this.life * 0.14 + this.driftSeed) * 0.24;
+        this.vx += turbulence;
+
+        // 4. Update coordinates
         this.x += this.vx;
         this.y += this.vy;
 
-        // Smooth accelerated fade out near end-of-life to guarantee ZERO ghost stacking
-        if (this.alpha < 0.35) {
-            this.alpha -= this.decay * 2.2;
-        } else {
-            this.alpha -= this.decay;
+        // 5. Shedding burning embers (creates golden shimmering cascade)
+        if (this.isWillow && this.life > 8 && Math.random() < 0.42 && this.alpha > 0.25) {
+            embers.push(new FloatingEmber(this.x, this.y, this.color));
+        }
+
+        // 6. Smooth non-linear burnout (zero ghost lines)
+        const progress = this.life / this.maxLife;
+        if (progress > 0.55) {
+            this.alpha = Math.max(0, 1 - (progress - 0.55) / 0.45);
         }
     }
 
     draw() {
-        if (this.alpha <= 0.03 || this.trail.length < 2) return;
+        if (this.alpha <= 0.02 || this.trail.length < 2) return;
 
         ctx.save();
         ctx.globalAlpha = Math.max(0, this.alpha);
 
-        // Clean light streak
+        // Draw graceful tapered light trail
         ctx.beginPath();
         ctx.moveTo(this.trail[0].x, this.trail[0].y);
         for (let i = 1; i < this.trail.length; i++) {
@@ -167,10 +260,10 @@ class Particle {
         ctx.lineCap = 'round';
         ctx.stroke();
 
-        // Incandescent spark head only while vibrant
-        if (this.twinkle && this.alpha > 0.45) {
+        // Incandescent glowing star head
+        if (this.alpha > 0.3) {
             ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size * 0.7, 0, Math.PI * 2);
+            ctx.arc(this.x, this.y, this.size * 0.75, 0, Math.PI * 2);
             ctx.fillStyle = '#ffffff';
             ctx.fill();
         }
@@ -187,7 +280,7 @@ class Rocket {
         this.lastX = startX;
         this.lastY = startY;
         this.targetY = targetY;
-        this.speed = 17;
+        this.speed = 17.5;
         this.acceleration = 1.015;
         this.isDead = false;
     }
@@ -198,15 +291,12 @@ class Rocket {
         this.y -= this.speed;
         this.speed *= this.acceleration;
 
-        // Emit realistic trailing sparks along flight path
+        // Trailing sparks along rocket flight path
         for (let i = 0; i < 3; i++) {
-            particles.push(new Particle(
+            embers.push(new FloatingEmber(
                 this.x + (Math.random() - 0.5) * 4,
-                this.y + Math.random() * 12,
-                Math.random() > 0.4 ? '#ffd700' : '#ff4500',
-                (Math.random() - 0.5) * 1.5,
-                Math.random() * 3 + 2,
-                false
+                this.y + Math.random() * 10,
+                Math.random() > 0.4 ? '#ffd700' : '#ff4500'
             ));
         }
 
@@ -227,49 +317,63 @@ class Rocket {
     }
 }
 
-// Grand Skyrocket Detonation
-function triggerGrandDetonation(x, y) {
-    const palette = COLOR_PALETTES[0]; // Radiant Gold & Saffron
-    const starCount = 380; // High-density crisp stars
+// 3D Spherical Shell Simulation (Expands symmetrically like real fireworks)
+function createSphericalShell(x, y, palette, isGrand = false) {
+    const starCount = isGrand ? 240 : 68;
+    const baseSpeed = isGrand ? 16.5 : 10.5;
 
+    // Center burst pop flash
+    coreFlashes.push(new CoreFlash(x, y, palette[0]));
+
+    // Fibonacci 3D sphere distribution projected onto 2D viewport
     for (let i = 0; i < starCount; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.pow(Math.random(), 0.5) * 16 + 2;
-        const color = palette[Math.floor(Math.random() * palette.length)];
+        const phi = Math.acos(1 - 2 * (i + 0.5) / starCount);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * i;
 
-        particles.push(new Particle(
+        // 3D unit vector
+        const dx = Math.sin(phi) * Math.cos(theta);
+        const dy = Math.sin(phi) * Math.sin(theta);
+
+        // Projected velocities with natural physical variance
+        const speed = baseSpeed * (0.84 + Math.random() * 0.32);
+        const vx = dx * speed;
+        // Viewers look up towards the sky, so upward arc looks natural
+        const vy = dy * speed - (isGrand ? 0.75 : 0.45);
+
+        const color = palette[Math.floor(Math.random() * palette.length)];
+        const isWillow = Math.random() > 0.28;
+
+        physicsStars.push(new PhysicsStar(x, y, vx, vy, color, isWillow));
+    }
+
+    // Inner sparkling pistil ring (center core flower)
+    const pistilCount = Math.floor(starCount * 0.28);
+    for (let i = 0; i < pistilCount; i++) {
+        const angle = (i / pistilCount) * Math.PI * 2 + Math.random() * 0.2;
+        const speed = baseSpeed * 0.42 * (0.8 + Math.random() * 0.4);
+        physicsStars.push(new PhysicsStar(
             x,
             y,
-            color,
             Math.cos(angle) * speed,
-            Math.sin(angle) * speed,
+            Math.sin(angle) * speed - 0.4,
+            '#ffffff',
+            false,
             true
         ));
     }
 }
 
+// Grand Skyrocket Detonation
+function triggerGrandDetonation(x, y) {
+    const palette = COLOR_PALETTES[0]; // Radiant Gold & Saffron
+    createSphericalShell(x, y, palette, true);
+}
+
 // Crisp Firework Burst
 function triggerCrispFirework(x, y, volume = 0.3) {
-    // Play single explosion sound at a controlled volume that never overpowers speech
     playExplosionSound(volume);
-
     const palette = COLOR_PALETTES[Math.floor(Math.random() * COLOR_PALETTES.length)];
-    const count = 75;
-
-    for (let i = 0; i < count; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 9 + 1.2;
-        const color = palette[Math.floor(Math.random() * palette.length)];
-
-        particles.push(new Particle(
-            x,
-            y,
-            color,
-            Math.cos(angle) * speed,
-            Math.sin(angle) * speed,
-            false
-        ));
-    }
+    createSphericalShell(x, y, palette, false);
 }
 
 // ===================================================
@@ -278,7 +382,7 @@ function triggerCrispFirework(x, y, volume = 0.3) {
 function loop() {
     requestAnimationFrame(loop);
 
-    // 1. Crystal clear frame wipe (zero ghosting, transparent over city backdrop)
+    // 1. Crystal-clear frame wipe (zero ghosting, transparent over city backdrop)
     ctx.clearRect(0, 0, width, height);
 
     // 2. Additive blending for luminous firework glow
@@ -295,7 +399,17 @@ function loop() {
         ctx.fill();
     }
 
-    // 4. Update & Draw Rockets
+    // 4. Update & Draw Core Burst Flashes
+    for (let i = coreFlashes.length - 1; i >= 0; i--) {
+        const f = coreFlashes[i];
+        f.update();
+        f.draw();
+        if (f.alpha <= 0) {
+            coreFlashes.splice(i, 1);
+        }
+    }
+
+    // 5. Update & Draw Rockets
     for (let i = rockets.length - 1; i >= 0; i--) {
         const r = rockets[i];
         r.update();
@@ -306,13 +420,23 @@ function loop() {
         }
     }
 
-    // 5. Update & Draw Particles (clean vanish with zero stacking)
-    for (let i = particles.length - 1; i >= 0; i--) {
-        const p = particles[i];
+    // 6. Update & Draw Floating Embers (Dancing glitter dust)
+    for (let i = embers.length - 1; i >= 0; i--) {
+        const e = embers[i];
+        e.update();
+        e.draw();
+        if (e.alpha <= 0) {
+            embers.splice(i, 1);
+        }
+    }
+
+    // 7. Update & Draw Physics Stars (Weeping & Dancing Arches)
+    for (let i = physicsStars.length - 1; i >= 0; i--) {
+        const p = physicsStars[i];
         p.update();
         p.draw();
         if (p.alpha <= 0) {
-            particles.splice(i, 1);
+            physicsStars.splice(i, 1);
         }
     }
 }
@@ -346,7 +470,7 @@ function executeDetonation(x, y) {
         diwaliAudio.play().catch(e => console.log('Audio autoplay info:', e));
     } catch (e) {}
 
-    // D. 380+ Crisp Fireworks Stars
+    // D. Grand 3D Spherical Detonation
     triggerGrandDetonation(x, y);
 
     // E. Visual Skyburst Flash
@@ -365,18 +489,17 @@ function executeDetonation(x, y) {
         celebrationScreen.classList.remove('hidden');
         isCelebration = true;
 
-        // Start Paced Automatic Fireworks (Slows down after 4-5 cracks)
+        // Start Paced Automatic Fireworks (Slows down after 4 cracks)
         autoCrackCount = 0;
         scheduleNextAutoFirework();
     }, 250);
 }
 
-// Background Automatic Fireworks: Paced comfortably, slows down after 4-5 cracks
-// to give users space to click and enjoy without rapid repeated spam
+// Background Automatic Fireworks: Paced comfortably, slows down after 4 cracks
 function scheduleNextAutoFirework() {
     if (!isCelebration) return;
 
-    // First 4 cracks: spaced at 2.4s. After 4 cracks: slows down to 6.0s - 7.5s!
+    // First 4 cracks: spaced at 2.4s. After 4 cracks: slows down to 6.0s - 7.5s
     const delay = (autoCrackCount < 4) ? 2400 : (Math.random() * 1500 + 6000);
 
     autoFireworksTimer = setTimeout(() => {
@@ -384,7 +507,7 @@ function scheduleNextAutoFirework() {
         autoCrackCount++;
 
         const rx = Math.random() * (width * 0.76) + (width * 0.12);
-        const ry = Math.random() * (height * 0.42) + 50;
+        const ry = Math.random() * (height * 0.40) + 50;
 
         // Subtle volume (0.16) so it never overpowers Modi Ji's speech
         triggerCrispFirework(rx, ry, 0.16);
@@ -439,6 +562,12 @@ replayBtn.addEventListener('click', (e) => {
     landingScreen.classList.remove('vanish');
     isCelebration = false;
     autoCrackCount = 0;
+
+    // Clear particle arrays
+    physicsStars = [];
+    embers = [];
+    coreFlashes = [];
+    rockets = [];
 
     if (autoFireworksTimer) clearTimeout(autoFireworksTimer);
     stopWhistleSound();
