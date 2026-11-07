@@ -213,6 +213,8 @@ class PhysicsStar {
 // Canvas-Based Realistic Rocket Projectile
 class Rocket {
     constructor(startX, startY, targetX, targetY, isGrand = false, volume = 0.3) {
+        this.startX = startX;
+        this.startY = startY;
         this.x = startX;
         this.y = startY;
         this.prevX = startX;
@@ -222,34 +224,43 @@ class Rocket {
         this.isGrand = isGrand;
         this.volume = volume;
 
-        const dx = targetX - startX;
-        const dy = targetY - startY;
-        const dist = Math.hypot(dx, dy) || 1;
-        // Fast, tactile climbing speed (reaches sky in ~0.25s - 0.35s)
-        const flightSpeed = isGrand ? 22.0 : 25.0;
-
-        this.vx = (dx / dist) * flightSpeed;
-        this.vy = (dy / dist) * flightSpeed;
+        // Grand first rocket duration is calibrated to EXACTLY 0.85s (perfect whistle audio sync)
+        // User taps and auto rockets have a swift, snappy 0.38s ascent
+        this.totalDuration = isGrand ? 0.85 : 0.38;
+        this.elapsed = 0;
         this.isDead = false;
     }
 
     update(dt) {
         this.prevX = this.x;
         this.prevY = this.y;
-        this.x += this.vx * dt;
-        this.y += this.vy * dt;
 
-        // Trailing sparks along rocket flight path from city
-        embers.push(new TrailingSpark(
-            this.x + (Math.random() - 0.5) * 2.5,
-            this.y + (Math.random() - 0.5) * 2.5,
-            this.vx * 0.1,
-            this.vy * 0.1 + 0.3,
-            Math.random() > 0.4 ? '#ffd700' : '#ff6a00'
-        ));
+        // Convert dt (frames) to real seconds
+        const dtSeconds = (dt * 16.667) / 1000;
+        this.elapsed += dtSeconds;
+
+        const progress = Math.min(1.0, this.elapsed / this.totalDuration);
+
+        // Smooth physical ascent curve (strong initial rocket thrust, gentle deceleration near apex)
+        const ease = 1 - Math.pow(1 - progress, this.isGrand ? 1.35 : 1.15);
+
+        this.x = this.startX + (this.targetX - this.startX) * ease;
+        this.y = this.startY + (this.targetY - this.startY) * ease;
+
+        // Heavy, realistic fiery rocket exhaust sparks shooting downward from nozzle
+        const sparkCount = this.isGrand ? 3 : 2;
+        for (let i = 0; i < sparkCount; i++) {
+            embers.push(new TrailingSpark(
+                this.x + (Math.random() - 0.5) * 3,
+                this.y + Math.random() * 5,
+                (Math.random() - 0.5) * 1.6,
+                Math.random() * 2.8 + 1.8, // Forceful downward thrust
+                Math.random() > 0.35 ? '#ffd700' : '#ff5500'
+            ));
+        }
 
         // Reached apex target in sky
-        if (this.y <= this.targetY) {
+        if (progress >= 1.0) {
             this.isDead = true;
         }
     }
@@ -379,13 +390,26 @@ function loop(now) {
         const r = rockets[i];
         r.update(dt);
 
+        // Glowing rocket exhaust streak
         ctx.globalAlpha = 1.0;
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2.6;
+        ctx.strokeStyle = r.isGrand ? '#fff8dc' : '#ffffff';
+        ctx.lineWidth = r.isGrand ? 3.6 : 2.5;
         ctx.beginPath();
         ctx.moveTo(r.prevX, r.prevY);
         ctx.lineTo(r.x, r.y);
         ctx.stroke();
+
+        // Incandescent burning rocket head
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.isGrand ? 3.5 : 2.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Golden fiery halo around rocket head
+        ctx.fillStyle = r.isGrand ? 'rgba(255, 200, 50, 0.55)' : 'rgba(255, 170, 50, 0.35)';
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.isGrand ? 9.5 : 6.0, 0, Math.PI * 2);
+        ctx.fill();
 
         if (r.isDead) {
             rockets.splice(i, 1);
@@ -450,9 +474,10 @@ function startLaunch() {
     // 1. Play authentic fast whistle sound as rocket ascends
     playWhistleSound();
 
-    // 2. Spawn grand canvas rocket shooting from city skyline
-    const targetY = height * 0.44;
-    rockets.push(new Rocket(width / 2, height * 0.85, width / 2, targetY, true, 0.85));
+    // 2. Spawn grand canvas rocket shooting from city skyline up into open sky
+    const startY = height * 0.92;
+    const targetY = height * 0.35;
+    rockets.push(new Rocket(width / 2, startY, width / 2, targetY, true, 0.9));
 }
 
 function executeDetonation(x, y) {

@@ -87,12 +87,12 @@ html, body {
     align-items: center;
     justify-content: center;
     background: radial-gradient(circle at center, #232528 0%, #141517 45%, #060607 80%, #000000 100%);
-    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .landing-screen.vanish {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.96);
     pointer-events: none;
 }
 
